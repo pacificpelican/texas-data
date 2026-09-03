@@ -23,13 +23,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
         $destination = $destinationDirectory . DIRECTORY_SEPARATOR . uniqid('file-', true) . '-' . $safeName;
         move_uploaded_file($file['tmp_name'], $destination);
 
+        $relativePath = normalize_storage_relative_path($destination);
         $filesByRegion[$targetRegion][] = [
             'id' => uniqid('upload-', true),
             'name' => $safeName,
             'size' => filesize($destination),
             'uploaded_by' => $user['name'],
             'uploaded_at' => gmdate('c'),
-            'path' => str_replace(app_path('storage') . DIRECTORY_SEPARATOR, '', $destination),
+            'path' => $relativePath,
         ];
 
         save_region_files($filesByRegion);
@@ -103,9 +104,14 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
                 <?php if (!empty($currentFiles)): ?>
                     <ul class="file-list">
                         <?php foreach ($currentFiles as $file): ?>
+                            <?php $safeFilePath = normalize_storage_relative_path((string) ($file['path'] ?? '')); ?>
                             <li class="file-item">
                                 <div>
-                                    <strong><?= htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <?php if ($safeFilePath !== ''): ?>
+                                        <strong><a href="file.php?path=<?= rawurlencode($safeFilePath) ?>" style="color: var(--primary); text-decoration: none;"><?= htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                    <?php else: ?>
+                                        <strong><?= htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <?php endif; ?>
                                     <div class="file-meta">Added by <?= htmlspecialchars($file['uploaded_by'], ENT_QUOTES, 'UTF-8') ?> · <?= date('M j, Y', strtotime((string) $file['uploaded_at'])) ?></div>
                                 </div>
                                 <span class="file-tag"><?= human_filesize((int) $file['size']) ?></span>

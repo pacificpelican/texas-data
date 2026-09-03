@@ -322,6 +322,22 @@ function sanitize_region_key($value)
     return in_array($value, $regions, true) ? $value : 'panhandle';
 }
 
+function normalize_storage_relative_path($path)
+{
+    $clean = str_replace('\\', '/', trim((string) $path));
+    $clean = preg_replace('#/+#', '/', $clean) ?? $clean;
+
+    if (preg_match('#(?:^|/)(storage/.+)$#', $clean, $matches)) {
+        return ltrim($matches[1], '/');
+    }
+
+    if (preg_match('#(?:^|/)(uploads/.+)$#', $clean, $matches)) {
+        return ltrim($matches[1], '/');
+    }
+
+    return ltrim($clean, '/.');
+}
+
 function append_region_file($regionKey, $payload)
 {
     $regionKey = sanitize_region_key($regionKey);

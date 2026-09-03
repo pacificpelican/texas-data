@@ -21,6 +21,22 @@
             "uploaded_by": "Mack Johnson",
             "uploaded_at": "2026-09-03T18:36:14+00:00",
             "path": "C:\\Users\\d\\texas-region-drive\\includes/..\\storage/uploads/panhandle\\file-6a99be1e926942.17440637-pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_3.png"
+        },
+        {
+            "id": "upload-6a99bf7c65cfa3.50502431",
+            "name": "texas-upload-test.txt",
+            "size": 33,
+            "uploaded_by": "Demo User",
+            "uploaded_at": "2026-09-03T18:42:04+00:00",
+            "path": "storage/uploads/panhandle/file-6a99bf7c65ac33.47033145-texas-upload-test.txt"
+        },
+        {
+            "id": "upload-6a99bf9264f2f0.55756184",
+            "name": "texas-upload-test.txt",
+            "size": 33,
+            "uploaded_by": "Demo User",
+            "uploaded_at": "2026-09-03T18:42:26+00:00",
+            "path": "storage/uploads/panhandle/file-6a99bf9264dca4.71722424-texas-upload-test.txt"
         }
     ],
     "north": [
