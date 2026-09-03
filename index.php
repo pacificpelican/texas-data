@@ -6,6 +6,7 @@ if (current_user()) {
 }
 
 $errors = [];
+$googleOAuthEnabled = google_oauth_enabled();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['email_login'])) {
@@ -31,6 +32,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Enter a valid Google account email to continue.';
     }
 }
+
+if (isset($_GET['error'])) {
+    $errors[] = trim((string) $_GET['error']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -49,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <ul class="hero-list">
                     <li>Five clickable regions across Texas</li>
                     <li>Simple file drive experience for teams</li>
-                    <li>Email login and Google-style sign in</li>
+                    <li>Email login and Google account sign in</li>
                 </ul>
             </div>
 
@@ -81,14 +86,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="divider">or</div>
 
-                <form method="post" class="form-stack">
-                    <label>
-                        Google account email
-                        <input type="email" name="google_email" placeholder="you@gmail.com" />
-                    </label>
+                <?php if ($googleOAuthEnabled): ?>
+                    <div class="form-stack">
+                        <a href="google-login.php" class="google" style="display: inline-block; width: 100%; text-align: center; text-decoration: none;">Continue with Google</a>
+                    </div>
+                <?php else: ?>
+                    <form method="post" class="form-stack">
+                        <label>
+                            Google account email
+                            <input type="email" name="google_email" placeholder="you@gmail.com" />
+                        </label>
 
-                    <button type="submit" name="google_login" value="1" class="google">Continue with Google</button>
-                </form>
+                        <button type="submit" name="google_login" value="1" class="google">Continue with Google</button>
+                    </form>
+                <?php endif; ?>
 
                 <p style="margin-top: 18px; font-size: 0.9rem; color: var(--muted);">Demo account: demo@texasdrive.app / demo123</p>
             </div>

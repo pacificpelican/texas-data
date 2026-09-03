@@ -51,6 +51,136 @@ function get_mysql_config()
     ];
 }
 
+function get_google_config()
+{
+    $config = get_app_config();
+    $google = $config['google'] ?? [];
+
+    $allowedDomains = $google['allowed_domains'] ?? [];
+    if (!is_array($allowedDomains)) {
+        $allowedDomains = [];
+    }
+
+    return [
+        'enabled' => !empty($google['enabled']),
+        'client_id' => (string) ($google['client_id'] ?? ''),
+        'client_secret' => (string) ($google['client_secret'] ?? ''),
+        'redirect_uri' => (string) ($google['redirect_uri'] ?? ''),
+        'allowed_domains' => array_values(array_map('strtolower', array_filter(array_map('trim', $allowedDomains), static fn($domain) => $domain !== ''))),
+    ];
+}
+
+function google_oauth_enabled()
+{
+    $config = get_google_config();
+    return $config['enabled']
+        && $config['client_id'] !== ''
+        && $config['client_secret'] !== ''
+        && $config['redirect_uri'] !== '';
+}
+
+function google_email_allowed($email, $allowedDomains = [])
+{
+    $email = strtolower(trim((string) $email));
+    if ($email === '' || !str_contains($email, '@')) {
+        return false;
+    }
+
+    $domain = strtolower(substr($email, strpos($email, '@') + 1));
+    if ($allowedDomains === []) {
+        return true;
+    }
+
+    return in_array($domain, array_map('strtolower', array_map('trim', $allowedDomains)), true);
+}
+
+function build_google_auth_url($redirectUri = null)
+{
+    if (!google_oauth_enabled()) {
+        return '';
+    }
+
+    $config = get_google_config();
+    $redirectUri = $redirectUri ?: $config['redirect_uri'];
+    $state = bin2hex(random_bytes(16));
+    $_SESSION['google_oauth_state'] = $state;
+
+    $params = [
+        'client_id' => $config['client_id'],
+        'redirect_uri' => $redirectUri,
+        'response_type' => 'code',
+        'scope' => 'openid email profile',
+        'access_type' => 'online',
+        'prompt' => 'select_account',
+        'state' => $state,
+    ];
+
+    return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
+}
+
+function exchange_google_code_for_tokens($code, $redirectUri = null)
+{
+    if (!google_oauth_enabled()) {
+        return null;
+    }
+
+    $config = get_google_config();
+    $redirectUri = $redirectUri ?: $config['redirect_uri'];
+    $payload = http_build_query([
+        'code' => $code,
+        'client_id' => $config['client_id'],
+        'client_secret' => $config['client_secret'],
+        'redirect_uri' => $redirectUri,
+        'grant_type' => 'authorization_code',
+    ]);
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\nAccept: application/json\r\n",
+            'content' => $payload,
+            'ignore_errors' => true,
+            'timeout' => 15,
+        ],
+    ]);
+
+    $response = @file_get_contents('https://oauth2.googleapis.com/token', false, $context);
+    if ($response === false) {
+        return null;
+    }
+
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded) || empty($decoded['access_token'])) {
+        return null;
+    }
+
+    return $decoded;
+}
+
+function fetch_google_userinfo($accessToken)
+{
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'GET',
+            'header' => "Authorization: Bearer " . $accessToken . "\r\nAccept: application/json\r\n",
+            'ignore_errors' => true,
+            'timeout' => 15,
+        ],
+    ]);
+
+    $response = @file_get_contents('https://openidconnect.googleapis.com/v1/userinfo', false, $context);
+    if ($response === false) {
+        return null;
+    }
+
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded) || empty($decoded['email'])) {
+        return null;
+    }
+
+    return $decoded;
+}
+
 function get_mysql_connection()
 {
     $config = get_mysql_config();
@@ -318,13 +448,13 @@ function sign_in_with_email($email, $password)
     return null;
 }
 
-function ensure_google_user($email)
+function ensure_google_user($email, $name = null)
 {
-    $email = strtolower(trim($email));
+    $email = strtolower(trim((string) $email));
     $users = get_users();
 
     foreach ($users as $user) {
-        if (strtolower($user['email'] ?? '') === $email) {
+        if (strtolower((string) ($user['email'] ?? '')) === $email) {
             return [
                 'id' => $user['id'],
                 'name' => $user['name'],
@@ -334,9 +464,14 @@ function ensure_google_user($email)
         }
     }
 
+    $friendlyName = trim((string) ($name ?? explode('@', $email)[0]));
+    if ($friendlyName === '') {
+        $friendlyName = explode('@', $email)[0];
+    }
+
     $newUser = [
         'id' => 'google-' . uniqid(),
-        'name' => explode('@', $email)[0],
+        'name' => $friendlyName,
         'email' => $email,
         'provider' => 'google',
     ];
