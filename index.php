@@ -91,14 +91,7 @@ if (isset($_GET['error'])) {
                         <a href="google-login.php" class="google" style="display: inline-block; width: 100%; text-align: center; text-decoration: none;">Continue with Google</a>
                     </div>
                 <?php else: ?>
-                    <form method="post" class="form-stack">
-                        <label>
-                            Google account email
-                            <input type="email" name="google_email" placeholder="you@gmail.com" />
-                        </label>
-
-                        <button type="submit" name="google_login" value="1" class="google">Continue with Google</button>
-                    </form>
+                    <div class="muted-note" style="margin-top: 8px; font-size: 0.9rem; color: var(--muted);">Google sign-in is currently unavailable.</div>
                 <?php endif; ?>
 
                 <p style="margin-top: 18px; font-size: 0.9rem; color: var(--muted);">Demo account: demo@texasdrive.app / demo123</p>
