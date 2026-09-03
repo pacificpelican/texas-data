@@ -1,0 +1,21 @@
+[
+    {
+        "id": "demo-user",
+        "name": "Demo User",
+        "email": "demo@texasdrive.app",
+        "password": "$2y$12$1R2BoW/mNClJPHRdJHJOfe3VkMTLAhqJb1nUyu6IkkYSHiHMSjxty",
+        "provider": "email"
+    },
+    {
+        "id": "google-6a99bc5a1c2bc",
+        "name": "newuser",
+        "email": "newuser@gmail.com",
+        "provider": "google"
+    },
+    {
+        "id": "google-6a99bc9a9dbae",
+        "name": "pacificpelican",
+        "email": "pacificpelican@gmail.com",
+        "provider": "google"
+    }
+]

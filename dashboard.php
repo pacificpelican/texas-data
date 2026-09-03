@@ -1,0 +1,131 @@
+<?php
+require_once __DIR__ . '/includes/app.php';
+require_login();
+
+$user = current_user();
+$selectedRegion = sanitize_region_key($_GET['region'] ?? 'panhandle');
+$regionMap = region_options();
+$filesByRegion = get_region_files();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
+    $targetRegion = sanitize_region_key((string) ($_POST['region'] ?? 'panhandle'));
+    $file = $_FILES['file'] ?? null;
+
+    if ($file && isset($file['tmp_name']) && $file['tmp_name'] !== '' && $file['error'] === UPLOAD_ERR_OK) {
+        $originalName = basename((string) $file['name']);
+        $safeName = preg_replace('/[^A-Za-z0-9_.-]/', '-', $originalName);
+        $safeName = trim($safeName, '-_');
+        $destinationDirectory = app_path('storage/uploads/' . $targetRegion);
+        if (!is_dir($destinationDirectory)) {
+            mkdir($destinationDirectory, 0777, true);
+        }
+
+        $destination = $destinationDirectory . DIRECTORY_SEPARATOR . uniqid('file-', true) . '-' . $safeName;
+        move_uploaded_file($file['tmp_name'], $destination);
+
+        $filesByRegion[$targetRegion][] = [
+            'id' => uniqid('upload-', true),
+            'name' => $safeName,
+            'size' => filesize($destination),
+            'uploaded_by' => $user['name'],
+            'uploaded_at' => gmdate('c'),
+            'path' => str_replace(app_path('storage') . DIRECTORY_SEPARATOR, '', $destination),
+        ];
+
+        save_region_files($filesByRegion);
+        $selectedRegion = $targetRegion;
+    }
+}
+
+$currentFiles = $filesByRegion[$selectedRegion] ?? [];
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Texas Regional Vault</title>
+    <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+    <main>
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark">TX</div>
+                <span>Texas Regional Vault</span>
+            </div>
+
+            <div class="user-chip">
+                <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                <a href="logout.php">Log out</a>
+            </div>
+        </header>
+
+        <section class="dashboard-layout">
+            <div class="panel map-panel">
+                <div class="map-header">
+                    <h2>Texas Regions</h2>
+                    <span><?= htmlspecialchars($regionMap[$selectedRegion] ?? 'Panhandle', ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
+
+                <svg class="map-svg" viewBox="0 0 500 620" role="img" aria-label="Texas map divided into five regions">
+                    <a class="map-region region-1 <?= $selectedRegion === 'panhandle' ? 'active' : '' ?>" href="dashboard.php?region=panhandle">
+                        <polygon points="140,50 360,50 410,190 310,220 135,175" />
+                    </a>
+                    <a class="map-region region-2 <?= $selectedRegion === 'north' ? 'active' : '' ?>" href="dashboard.php?region=north">
+                        <polygon points="150,185 325,185 390,340 265,420 120,350" />
+                    </a>
+                    <a class="map-region region-3 <?= $selectedRegion === 'central' ? 'active' : '' ?>" href="dashboard.php?region=central">
+                        <polygon points="135,340 275,420 355,560 240,610 100,530" />
+                    </a>
+                    <a class="map-region region-4 <?= $selectedRegion === 'gulf' ? 'active' : '' ?>" href="dashboard.php?region=gulf">
+                        <polygon points="80,430 200,360 285,470 230,610 90,610" />
+                    </a>
+                    <a class="map-region region-5 <?= $selectedRegion === 'south' ? 'active' : '' ?>" href="dashboard.php?region=south">
+                        <polygon points="90,240 180,180 210,300 140,430 35,370" />
+                    </a>
+
+                    <g font-size="16" font-weight="700" fill="#163d68">
+                        <text x="170" y="120">Panhandle</text>
+                        <text x="155" y="270">North</text>
+                        <text x="155" y="490">Central</text>
+                        <text x="95" y="535">Gulf</text>
+                        <text x="58" y="295">South</text>
+                    </g>
+                </svg>
+            </div>
+
+            <aside class="panel file-panel">
+                <div class="map-header">
+                    <h2><?= htmlspecialchars($regionMap[$selectedRegion] ?? 'Panhandle', ENT_QUOTES, 'UTF-8') ?> files</h2>
+                </div>
+
+                <?php if (!empty($currentFiles)): ?>
+                    <ul class="file-list">
+                        <?php foreach ($currentFiles as $file): ?>
+                            <li class="file-item">
+                                <div>
+                                    <strong><?= htmlspecialchars($file['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <div class="file-meta">Added by <?= htmlspecialchars($file['uploaded_by'], ENT_QUOTES, 'UTF-8') ?> · <?= date('M j, Y', strtotime((string) $file['uploaded_at'])) ?></div>
+                                </div>
+                                <span class="file-tag"><?= human_filesize((int) $file['size']) ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php else: ?>
+                    <div class="empty-state">This region is empty. Add the first file for this team.</div>
+                <?php endif; ?>
+
+                <div class="upload-card">
+                    <h3>Add a file</h3>
+                    <form method="post" enctype="multipart/form-data" class="inline-form">
+                        <input type="hidden" name="region" value="<?= htmlspecialchars($selectedRegion, ENT_QUOTES, 'UTF-8') ?>" />
+                        <input type="file" name="file" required />
+                        <button type="submit" name="upload_file" value="1" class="primary">Upload</button>
+                    </form>
+                </div>
+            </aside>
+        </section>
+    </main>
+</body>
+</html>
