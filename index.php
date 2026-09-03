@@ -75,6 +75,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" name="email_login" value="1" class="primary">Sign in with email</button>
                 </form>
 
+                <p style="margin: 16px 0 0; text-align: center; font-size: 0.95rem;">
+                    Need an account? <a href="signup.php">Create one</a>
+                </p>
+
                 <div class="divider">or</div>
 
                 <form method="post" class="form-stack">

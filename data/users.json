@@ -17,5 +17,25 @@
         "name": "pacificpelican",
         "email": "pacificpelican@gmail.com",
         "provider": "google"
+    },
+    {
+        "id": "google-6a99bd5f5cbfa",
+        "name": "black",
+        "email": "black@google.com",
+        "provider": "google"
+    },
+    {
+        "id": "user-6a99bdd0172b2",
+        "name": "Alice Smith",
+        "email": "alice@example.com",
+        "password": "$2y$12$hSskIO5wu9hwhxAGdfM5S.mey1hFtRf9XQdhbfDj.T33SCRTTBihW",
+        "provider": "email"
+    },
+    {
+        "id": "user-6a99be109d2b1",
+        "name": "Mack Johnson",
+        "email": "2020@sf3am.com",
+        "password": "$2y$12$95ySkyi41I3sNhQvAbq36.IaJ8amJyg.BZyoTk88CA9zzcb6uVjOq",
+        "provider": "email"
     }
 ]

@@ -178,6 +178,53 @@ function ensure_google_user($email)
     ];
 }
 
+function create_email_account($name, $email, $password)
+{
+    $name = trim((string) $name);
+    $email = strtolower(trim((string) $email));
+    $password = (string) $password;
+
+    if ($name === '') {
+        return ['ok' => false, 'message' => 'Please enter your full name.'];
+    }
+
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return ['ok' => false, 'message' => 'Please enter a valid email address.'];
+    }
+
+    if (strlen($password) < 6) {
+        return ['ok' => false, 'message' => 'Password must be at least 6 characters long.'];
+    }
+
+    $users = get_users();
+    foreach ($users as $user) {
+        if (strtolower((string) ($user['email'] ?? '')) === $email) {
+            return ['ok' => false, 'message' => 'An account with that email already exists.'];
+        }
+    }
+
+    $newUser = [
+        'id' => 'user-' . uniqid(),
+        'name' => $name,
+        'email' => $email,
+        'password' => password_hash($password, PASSWORD_DEFAULT),
+        'provider' => 'email',
+    ];
+
+    $users[] = $newUser;
+    save_users($users);
+
+    return [
+        'ok' => true,
+        'user' => [
+            'id' => $newUser['id'],
+            'name' => $newUser['name'],
+            'email' => $newUser['email'],
+            'provider' => $newUser['provider'],
+        ],
+    ];
+}
+
 function ensure_region_files()
 {
     $file = app_path('data/region-files.json');
