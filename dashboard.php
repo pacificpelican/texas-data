@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
             'name' => $safeName,
             'size' => filesize($destination),
             'uploaded_by' => $user['name'],
-            'uploaded_at' => gmdate('c'),
+            'uploaded_at' => normalize_mysql_datetime(gmdate('c')),
             'path' => $relativePath,
         ];
 

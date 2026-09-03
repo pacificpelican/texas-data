@@ -3,6 +3,126 @@ session_start();
 
 const APP_ROOT = __DIR__ . '/..';
 
+function get_app_config()
+{
+    $configFile = app_path('config.php');
+    if (!file_exists($configFile)) {
+        return [
+            'mysql' => [
+                'enabled' => false,
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'database' => '',
+                'username' => '',
+                'password' => '',
+            ],
+        ];
+    }
+
+    $config = require $configFile;
+    if (!is_array($config)) {
+        return [
+            'mysql' => [
+                'enabled' => false,
+                'host' => '127.0.0.1',
+                'port' => 3306,
+                'database' => '',
+                'username' => '',
+                'password' => '',
+            ],
+        ];
+    }
+
+    return $config;
+}
+
+function get_mysql_config()
+{
+    $config = get_app_config();
+    $mysql = $config['mysql'] ?? [];
+
+    return [
+        'enabled' => !empty($mysql['enabled']),
+        'host' => (string) ($mysql['host'] ?? '127.0.0.1'),
+        'port' => (int) ($mysql['port'] ?? 3306),
+        'database' => (string) ($mysql['database'] ?? ''),
+        'username' => (string) ($mysql['username'] ?? ''),
+        'password' => (string) ($mysql['password'] ?? ''),
+    ];
+}
+
+function get_mysql_connection()
+{
+    $config = get_mysql_config();
+    if (!$config['enabled'] || $config['host'] === '' || $config['username'] === '' || $config['database'] === '') {
+        return null;
+    }
+
+    $connection = @mysqli_init();
+    if ($connection === false) {
+        return null;
+    }
+
+    $connection->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
+
+    $connected = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], $config['database'], $config['port']);
+    if ($connected) {
+        ensure_mysql_schema($connection);
+        return $connection;
+    }
+
+    $fallback = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], null, $config['port']);
+    if (!$fallback) {
+        @mysqli_close($connection);
+        return null;
+    }
+
+    $databaseName = mysqli_real_escape_string($connection, $config['database']);
+    $ddl = "CREATE DATABASE IF NOT EXISTS `$databaseName`;";
+    $createResult = mysqli_query($connection, $ddl);
+    if ($createResult === false) {
+        @mysqli_close($connection);
+        return null;
+    }
+
+    mysqli_select_db($connection, $config['database']);
+    ensure_mysql_schema($connection);
+
+    return $connection;
+}
+
+function ensure_mysql_schema($connection)
+{
+    if (!($connection instanceof mysqli)) {
+        return;
+    }
+
+    $userSql = "
+        CREATE TABLE IF NOT EXISTS users (
+            id VARCHAR(255) PRIMARY KEY,
+            name VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL UNIQUE,
+            password VARCHAR(255) DEFAULT NULL,
+            provider VARCHAR(50) NOT NULL DEFAULT 'email'
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ";
+
+    $regionSql = "
+        CREATE TABLE IF NOT EXISTS region_files (
+            id VARCHAR(255) PRIMARY KEY,
+            region VARCHAR(50) NOT NULL,
+            name VARCHAR(255) NOT NULL,
+            size BIGINT NOT NULL DEFAULT 0,
+            uploaded_by VARCHAR(255) NOT NULL,
+            uploaded_at DATETIME NOT NULL,
+            path VARCHAR(500) NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ";
+
+    mysqli_query($connection, $userSql);
+    mysqli_query($connection, $regionSql);
+}
+
 function app_path($path = '')
 {
     $base = APP_ROOT;
@@ -88,14 +208,9 @@ function region_label($key)
     return $regions[$key] ?? ucfirst(str_replace('-', ' ', $key));
 }
 
-function ensure_initial_users()
+function default_user_list()
 {
-    $file = app_path('data/users.json');
-    if (file_exists($file)) {
-        return;
-    }
-
-    $users = [
+    return [
         [
             'id' => 'demo-user',
             'name' => 'Demo User',
@@ -104,18 +219,77 @@ function ensure_initial_users()
             'provider' => 'email',
         ],
     ];
+}
 
-    write_json_file($file, $users);
+function ensure_initial_users()
+{
+    $file = app_path('data/users.json');
+    if (file_exists($file)) {
+        return;
+    }
+
+    write_json_file($file, default_user_list());
 }
 
 function get_users()
 {
+    $connection = get_mysql_connection();
+    if ($connection) {
+        $query = mysqli_query($connection, "SELECT id, name, email, password, provider FROM users");
+        $users = [];
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $users[] = [
+                    'id' => (string) $row['id'],
+                    'name' => (string) $row['name'],
+                    'email' => (string) $row['email'],
+                    'password' => $row['password'] ?? null,
+                    'provider' => $row['provider'] ?? 'email',
+                ];
+            }
+        }
+        mysqli_close($connection);
+
+        if ($users === []) {
+            $seedUsers = default_user_list();
+            save_users($seedUsers);
+            return $seedUsers;
+        }
+
+        return $users;
+    }
+
     ensure_initial_users();
     return read_json_file(app_path('data/users.json'), []);
 }
 
 function save_users($users)
 {
+    $connection = get_mysql_connection();
+    if ($connection) {
+        foreach ($users as $user) {
+            $escapedId = mysqli_real_escape_string($connection, (string) ($user['id'] ?? ''));
+            $escapedName = mysqli_real_escape_string($connection, (string) ($user['name'] ?? ''));
+            $escapedEmail = mysqli_real_escape_string($connection, strtolower((string) ($user['email'] ?? '')));
+            $escapedPassword = $user['password'] ?? null;
+            $escapedPassword = $escapedPassword === null ? 'NULL' : "'" . mysqli_real_escape_string($connection, (string) $escapedPassword) . "'";
+            $provider = mysqli_real_escape_string($connection, (string) (($user['provider'] ?? 'email')));
+            $sql = "
+                INSERT INTO users (id, name, email, password, provider)
+                VALUES ('$escapedId', '$escapedName', '$escapedEmail', $escapedPassword, '$provider')
+                ON DUPLICATE KEY UPDATE
+                    name = VALUES(name),
+                    email = VALUES(email),
+                    password = VALUES(password),
+                    provider = VALUES(provider)
+            ";
+            mysqli_query($connection, $sql);
+        }
+
+        mysqli_close($connection);
+        return true;
+    }
+
     return write_json_file(app_path('data/users.json'), $users);
 }
 
@@ -225,14 +399,9 @@ function create_email_account($name, $email, $password)
     ];
 }
 
-function ensure_region_files()
+function default_region_payload()
 {
-    $file = app_path('data/region-files.json');
-    if (file_exists($file)) {
-        return;
-    }
-
-    $payload = [
+    return [
         'panhandle' => [
             [
                 'id' => 'pan-01',
@@ -286,12 +455,60 @@ function ensure_region_files()
             ],
         ],
     ];
+}
 
-    write_json_file($file, $payload);
+function ensure_region_files()
+{
+    $file = app_path('data/region-files.json');
+    if (file_exists($file)) {
+        return;
+    }
+
+    write_json_file($file, default_region_payload());
 }
 
 function get_region_files()
 {
+    $connection = get_mysql_connection();
+    if ($connection) {
+        $query = mysqli_query($connection, "SELECT region, id, name, size, uploaded_by, uploaded_at, path FROM region_files ORDER BY uploaded_at DESC");
+        $payload = [
+            'panhandle' => [],
+            'north' => [],
+            'central' => [],
+            'gulf' => [],
+            'south' => [],
+        ];
+
+        if ($query) {
+            while ($row = mysqli_fetch_assoc($query)) {
+                $region = (string) ($row['region'] ?? 'panhandle');
+                if (!isset($payload[$region])) {
+                    $payload[$region] = [];
+                }
+
+                $payload[$region][] = [
+                    'id' => (string) $row['id'],
+                    'name' => (string) $row['name'],
+                    'size' => (int) $row['size'],
+                    'uploaded_by' => (string) $row['uploaded_by'],
+                    'uploaded_at' => (string) $row['uploaded_at'],
+                    'path' => (string) $row['path'],
+                ];
+            }
+        }
+
+        mysqli_close($connection);
+
+        if (array_sum(array_map('count', $payload)) === 0) {
+            $seedPayload = default_region_payload();
+            save_region_files($seedPayload);
+            return $seedPayload;
+        }
+
+        return $payload;
+    }
+
     ensure_region_files();
     $default = [
         'panhandle' => [],
@@ -313,6 +530,37 @@ function get_region_files()
 
 function save_region_files($payload)
 {
+    $connection = get_mysql_connection();
+    if ($connection) {
+        foreach ($payload as $region => $files) {
+            foreach ($files as $file) {
+                $id = (string) ($file['id'] ?? uniqid('mysql-', true));
+                $name = mysqli_real_escape_string($connection, (string) ($file['name'] ?? 'untitled'));
+                $size = (int) ($file['size'] ?? 0);
+                $uploadedBy = mysqli_real_escape_string($connection, (string) ($file['uploaded_by'] ?? 'Unknown'));
+                $uploadedAt = mysqli_real_escape_string($connection, normalize_mysql_datetime((string) ($file['uploaded_at'] ?? gmdate('Y-m-d H:i:s'))));
+                $path = mysqli_real_escape_string($connection, normalize_storage_relative_path((string) ($file['path'] ?? '')));
+                $regionKey = mysqli_real_escape_string($connection, sanitize_region_key((string) $region));
+
+                $sql = "
+                    INSERT INTO region_files (id, region, name, size, uploaded_by, uploaded_at, path)
+                    VALUES ('$id', '$regionKey', '$name', $size, '$uploadedBy', '$uploadedAt', '$path')
+                    ON DUPLICATE KEY UPDATE
+                        region = VALUES(region),
+                        name = VALUES(name),
+                        size = VALUES(size),
+                        uploaded_by = VALUES(uploaded_by),
+                        uploaded_at = VALUES(uploaded_at),
+                        path = VALUES(path)
+                ";
+                mysqli_query($connection, $sql);
+            }
+        }
+
+        mysqli_close($connection);
+        return true;
+    }
+
     return write_json_file(app_path('data/region-files.json'), $payload);
 }
 
@@ -320,6 +568,16 @@ function sanitize_region_key($value)
 {
     $regions = array_keys(region_options());
     return in_array($value, $regions, true) ? $value : 'panhandle';
+}
+
+function normalize_mysql_datetime($value)
+{
+    $timestamp = strtotime((string) $value);
+    if ($timestamp === false) {
+        return gmdate('Y-m-d H:i:s');
+    }
+
+    return gmdate('Y-m-d H:i:s', $timestamp);
 }
 
 function normalize_storage_relative_path($path)
