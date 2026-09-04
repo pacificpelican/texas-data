@@ -37,6 +37,14 @@
             "uploaded_by": "Demo User",
             "uploaded_at": "2026-09-03T18:42:26+00:00",
             "path": "storage/uploads/panhandle/file-6a99bf9264dca4.71722424-texas-upload-test.txt"
+        },
+        {
+            "id": "upload-6a9a27c5210570.31235526",
+            "name": "pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_0.png",
+            "size": 1905915,
+            "uploaded_by": "Mack Johnson",
+            "uploaded_at": "2026-09-04 02:07:01",
+            "path": "storage/uploads/panhandle/file-6a9a27c520d1c7.56181334-pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_0.png"
         }
     ],
     "north": [

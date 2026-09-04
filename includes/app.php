@@ -288,11 +288,24 @@ function write_json_file($filePath, $data)
 {
     $directory = dirname($filePath);
     if (!is_dir($directory)) {
-        mkdir($directory, 0777, true);
+        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+            error_log('Unable to create storage directory: ' . $directory);
+            return false;
+        }
+    }
+
+    if (!is_writable($directory)) {
+        error_log('Storage directory is not writable: ' . $directory);
+        return false;
     }
 
     $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    return file_put_contents($filePath, $json . PHP_EOL) !== false;
+    $written = file_put_contents($filePath, $json . PHP_EOL);
+    if ($written === false) {
+        error_log('Unable to write JSON file: ' . $filePath);
+    }
+
+    return $written !== false;
 }
 
 function current_user()

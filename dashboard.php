@@ -6,6 +6,7 @@ $user = current_user();
 $selectedRegion = sanitize_region_key($_GET['region'] ?? 'panhandle');
 $regionMap = region_options();
 $filesByRegion = get_region_files();
+$errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
     $targetRegion = sanitize_region_key((string) ($_POST['region'] ?? 'panhandle'));
@@ -21,20 +22,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
         }
 
         $destination = $destinationDirectory . DIRECTORY_SEPARATOR . uniqid('file-', true) . '-' . $safeName;
-        move_uploaded_file($file['tmp_name'], $destination);
+        if (!move_uploaded_file($file['tmp_name'], $destination)) {
+            $errors[] = 'Upload failed. Check that the app can write to the project storage folder.';
+        } else {
+            $relativePath = normalize_storage_relative_path($destination);
+            $filesByRegion[$targetRegion][] = [
+                'id' => uniqid('upload-', true),
+                'name' => $safeName,
+                'size' => filesize($destination),
+                'uploaded_by' => $user['name'],
+                'uploaded_at' => normalize_mysql_datetime(gmdate('c')),
+                'path' => $relativePath,
+            ];
 
-        $relativePath = normalize_storage_relative_path($destination);
-        $filesByRegion[$targetRegion][] = [
-            'id' => uniqid('upload-', true),
-            'name' => $safeName,
-            'size' => filesize($destination),
-            'uploaded_by' => $user['name'],
-            'uploaded_at' => normalize_mysql_datetime(gmdate('c')),
-            'path' => $relativePath,
-        ];
+            if (!save_region_files($filesByRegion)) {
+                $errors[] = 'File uploaded, but metadata could not be saved. Check write permissions for the data folder.';
+            }
 
-        save_region_files($filesByRegion);
-        $selectedRegion = $targetRegion;
+            $selectedRegion = $targetRegion;
+        }
     }
 }
 
