@@ -576,6 +576,98 @@ button.google {
     font-weight: 700;
 }
 
+.assistant-page {
+    display: grid;
+    gap: 18px;
+}
+
+.assistant-shell {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 22px;
+    align-items: start;
+}
+
+.assistant-form,
+.assistant-output {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 22px 20px;
+}
+
+.assistant-form h2,
+.assistant-output h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+}
+
+.assistant-form form {
+    display: grid;
+    gap: 14px;
+}
+
+.assistant-form label {
+    display: grid;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.assistant-form select,
+.assistant-form textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px 14px;
+    font: inherit;
+    background: #f8fbff;
+    color: var(--ink);
+}
+
+.assistant-form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.assistant-file-list {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+}
+
+.assistant-file-list ul {
+    margin: 12px 0 0;
+    padding-left: 18px;
+    color: var(--muted);
+    display: grid;
+    gap: 8px;
+}
+
+.assistant-output {
+    min-height: 360px;
+}
+
+.ai-response {
+    white-space: pre-wrap;
+    line-height: 1.7;
+    color: var(--ink);
+    background: #f8fbff;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.ai-empty {
+    color: var(--muted);
+    border: 1px dashed var(--line);
+    border-radius: 14px;
+    padding: 18px;
+    background: rgba(21, 76, 155, 0.02);
+}
+
 .vault-pagination {
     display: flex;
     justify-content: space-between;

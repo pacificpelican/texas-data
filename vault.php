@@ -40,6 +40,7 @@ $uploadsStatus = get_uploads_dir_status();
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <a href="dashboard.php?region=<?= rawurlencode($currentRegion) ?>">Back to map</a>
+                    <a href="assistant.php?region=<?= rawurlencode($currentRegion) ?>">AI Assistant</a>
                     <a href="logout.php">Log out</a>
                 </div>
 

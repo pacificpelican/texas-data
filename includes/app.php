@@ -949,3 +949,165 @@ function get_uploads_dir_status()
         'detail' => 'writable by PHP',
     ];
 }
+
+function get_llm_config()
+{
+    $config = get_app_config();
+    $llm = $config['llm'] ?? [];
+
+    return [
+        'enabled' => !empty($llm['enabled']),
+        'provider' => strtolower((string) ($llm['provider'] ?? 'ollama')),
+        'api_url' => (string) ($llm['api_url'] ?? 'http://localhost:11434/api/generate'),
+        'model' => (string) ($llm['model'] ?? 'llama3.1:8b'),
+        'temperature' => (float) ($llm['temperature'] ?? 0.7),
+    ];
+}
+
+function command_exists($command)
+{
+    $path = '';
+    $shell = PHP_OS_FAMILY === 'Windows' ? 'where ' : 'which ';
+    $result = @shell_exec($shell . escapeshellarg($command) . ' 2>/dev/null');
+    if (is_string($result)) {
+        $path = trim((string) $result);
+    }
+
+    return $path !== '';
+}
+
+function extract_text_from_file($filePath)
+{
+    if (!is_file($filePath)) {
+        return '';
+    }
+
+    $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+    $raw = @file_get_contents($filePath);
+    if ($raw === false) {
+        return '';
+    }
+
+    $textTypes = ['txt', 'md', 'csv', 'json', 'log', 'xml', 'yaml', 'yml', 'sql', 'js', 'ts', 'tsx', 'jsx', 'css', 'html', 'htm', 'php', 'py', 'rb', 'java'];
+    if (in_array($extension, $textTypes, true)) {
+        $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $raw) ?? $raw;
+        return trim((string) $text);
+    }
+
+    if ($extension === 'pdf' && command_exists('pdftotext')) {
+        $output = @shell_exec('pdftotext ' . escapeshellarg($filePath) . ' - 2>/dev/null');
+        return trim((string) ($output ?? ''));
+    }
+
+    if (in_array($extension, ['doc', 'docx'], true) && command_exists('pandoc')) {
+        $output = @shell_exec('pandoc ' . escapeshellarg($filePath) . ' -t plain 2>/dev/null');
+        return trim((string) ($output ?? ''));
+    }
+
+    if (in_array($extension, ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'], true) && command_exists('tesseract')) {
+        $output = @shell_exec('tesseract ' . escapeshellarg($filePath) . ' stdout 2>/dev/null');
+        return trim((string) ($output ?? ''));
+    }
+
+    return '';
+}
+
+function collect_vault_documents($regionFilter = null)
+{
+    $allFiles = get_region_files();
+    $regions = $regionFilter !== null ? [$regionFilter => $allFiles[$regionFilter] ?? []] : $allFiles;
+    $documents = [];
+
+    foreach ($regions as $regionKey => $files) {
+        foreach ($files as $file) {
+            $relativePath = normalize_storage_relative_path((string) ($file['path'] ?? ''));
+            $absolutePath = $relativePath === '' ? '' : app_path($relativePath);
+            $text = $absolutePath !== '' && file_exists($absolutePath) ? extract_text_from_file($absolutePath) : '';
+            $trimmed = trim((string) $text);
+            $documents[] = [
+                'region' => sanitize_region_key((string) $regionKey),
+                'region_label' => region_label(sanitize_region_key((string) $regionKey)),
+                'name' => (string) ($file['name'] ?? 'untitled'),
+                'uploaded_at' => (string) ($file['uploaded_at'] ?? gmdate('c')),
+                'path' => $relativePath,
+                'text' => $trimmed !== '' ? $trimmed : '(No readable text was available for this document. It may be binary or an unsupported file type.)',
+            ];
+        }
+    }
+
+    usort($documents, static fn($a, $b) => strtotime((string) $b['uploaded_at']) <=> strtotime((string) $a['uploaded_at']));
+
+    return $documents;
+}
+
+function build_vault_assistant_prompt($task, $question, $documents)
+{
+    $taskMap = [
+        'summary' => 'Provide a concise summary of the documents and highlight the main themes, risks, and action items.',
+        'story' => 'Turn the documents into a clear narrative or story that reads like a polished summary of what happened, why it matters, and what is likely next.',
+        'confirmation' => 'Review the documents for confirming evidence and produce a short confirmation memo with the strongest supporting points.',
+        'rebuttal' => 'Review the documents critically and create a balanced rebuttal or counter-argument based only on what is in the material.',
+    ];
+
+    $taskLabel = $taskMap[$task] ?? $taskMap['summary'];
+    $docText = "";
+    foreach ($documents as $index => $doc) {
+        $docText .= "\n--- Document " . ($index + 1) . " ---\n";
+        $docText .= "Region: " . $doc['region_label'] . "\n";
+        $docText .= "File: " . $doc['name'] . "\n";
+        $docText .= "Uploaded: " . $doc['uploaded_at'] . "\n\n";
+        $docText .= $doc['text'] . "\n";
+    }
+
+    $customQuestion = trim((string) $question);
+    $questionText = $customQuestion !== '' ? "\n\nUser request: " . $customQuestion : "";
+
+    return "You are a careful analyst and writer helping review regional documents for a Texas file vault. " .
+        "Use only the provided documents as the basis for your answer. " .
+        "Do not invent facts. If the documents do not provide enough evidence, say so clearly.\n\n" .
+        $taskLabel . "\n\nDocuments:\n" . $docText . $questionText;
+}
+
+function ask_local_llm($prompt, $model = null)
+{
+    $config = get_llm_config();
+    if (!$config['enabled']) {
+        return ['ok' => false, 'message' => 'The local LLM is disabled in config.php. Enable Ollama and set the model to use the assistant.'];
+    }
+
+    $payload = [
+        'model' => $model ?: $config['model'],
+        'prompt' => (string) $prompt,
+        'stream' => false,
+        'options' => [
+            'temperature' => (float) $config['temperature'],
+        ],
+    ];
+
+    $context = stream_context_create([
+        'http' => [
+            'method' => 'POST',
+            'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
+            'content' => json_encode($payload),
+            'ignore_errors' => true,
+            'timeout' => 90,
+        ],
+    ]);
+
+    $raw = @file_get_contents($config['api_url'], false, $context);
+    if ($raw === false) {
+        return ['ok' => false, 'message' => 'The local Ollama server could not be reached at ' . htmlspecialchars($config['api_url'], ENT_QUOTES, 'UTF-8')];
+    }
+
+    $decoded = json_decode($raw, true);
+    if (!is_array($decoded)) {
+        return ['ok' => false, 'message' => 'The model returned an unexpected response format.'];
+    }
+
+    $answer = trim((string) ($decoded['response'] ?? ''));
+    if ($answer === '') {
+        return ['ok' => false, 'message' => 'The model returned an empty response.'];
+    }
+
+    return ['ok' => true, 'answer' => $answer];
+}
