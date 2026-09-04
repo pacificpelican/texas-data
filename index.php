@@ -52,11 +52,11 @@ if (isset($_GET['error'])) {
         <section class="auth-grid">
             <div class="hero-panel">
                 <h1>Texas Regional Vault</h1>
-                <p>Share files across the state by region. Keep local project plans, maps, and documents organized in one simple place.</p>
+                <p>Organize files by Texas region and keep local project materials, maps, and records in one place.</p>
                 <ul class="hero-list">
-                    <li>Five clickable regions across Texas</li>
-                    <li>Simple file drive experience for teams</li>
-                    <li>Email login and Google account sign in</li>
+                    <li>Five regional workspaces across Texas</li>
+                    <li>Upload, browse, and share files by region</li>
+                    <li>Secure email sign-in with optional Google access</li>
                 </ul>
             </div>
 
@@ -111,7 +111,6 @@ if (isset($_GET['error'])) {
                     <div class="muted-note" style="margin-top: 8px; font-size: 0.9rem; color: var(--muted);">Google sign-in is currently unavailable.</div>
                 <?php endif; ?>
 
-                <p style="margin-top: 18px; font-size: 0.9rem; color: var(--muted);">Demo account: demo@texasdrive.app / demo123</p>
             </div>
         </section>
     </main>
