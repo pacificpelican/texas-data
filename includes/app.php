@@ -204,30 +204,35 @@ function get_mysql_connection()
 
     $connection->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
 
-    $connected = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], $config['database'], $config['port']);
-    if ($connected) {
+    try {
+        $connected = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], $config['database'], $config['port']);
+        if ($connected) {
+            ensure_mysql_schema($connection);
+            return $connection;
+        }
+
+        $fallback = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], null, $config['port']);
+        if (!$fallback) {
+            @mysqli_close($connection);
+            return null;
+        }
+
+        $databaseName = mysqli_real_escape_string($connection, $config['database']);
+        $ddl = "CREATE DATABASE IF NOT EXISTS `$databaseName`;";
+        $createResult = mysqli_query($connection, $ddl);
+        if ($createResult === false) {
+            @mysqli_close($connection);
+            return null;
+        }
+
+        mysqli_select_db($connection, $config['database']);
         ensure_mysql_schema($connection);
+
         return $connection;
-    }
-
-    $fallback = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], null, $config['port']);
-    if (!$fallback) {
+    } catch (mysqli_sql_exception $exception) {
         @mysqli_close($connection);
         return null;
     }
-
-    $databaseName = mysqli_real_escape_string($connection, $config['database']);
-    $ddl = "CREATE DATABASE IF NOT EXISTS `$databaseName`;";
-    $createResult = mysqli_query($connection, $ddl);
-    if ($createResult === false) {
-        @mysqli_close($connection);
-        return null;
-    }
-
-    mysqli_select_db($connection, $config['database']);
-    ensure_mysql_schema($connection);
-
-    return $connection;
 }
 
 function ensure_mysql_schema($connection)
