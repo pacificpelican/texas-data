@@ -7,6 +7,8 @@ if (current_user()) {
 
 $errors = [];
 $googleOAuthEnabled = google_oauth_enabled();
+$storageStatus = get_storage_mode_status();
+$uploadsStatus = get_uploads_dir_status();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['email_login'])) {
@@ -83,6 +85,18 @@ if (isset($_GET['error'])) {
                 <p style="margin: 16px 0 0; text-align: center; font-size: 0.95rem;">
                     Need an account? <a href="signup.php">Create one</a>
                 </p>
+
+                <div class="debug-panel auth-debug-panel" aria-live="polite">
+                    <div class="debug-row">
+                        <span class="debug-label">Data:</span>
+                        <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Uploads:</span>
+                        <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?refresh=' + Date.now();">Hard refresh</button>
+                </div>
 
                 <div class="divider">or</div>
 

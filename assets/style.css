@@ -143,6 +143,12 @@ header.topbar {
     margin-top: 2px;
 }
 
+.auth-debug-panel {
+    margin-top: 18px;
+    margin-bottom: 10px;
+    min-width: 0;
+}
+
 .auth-shell {
     min-height: 100vh;
     display: grid;
