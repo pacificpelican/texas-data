@@ -1,12 +1,12 @@
 <?php
 return [
     'mysql' => [
-        'enabled' => false,
+        'enabled' => true,
         'host' => '127.0.0.1',
         'port' => 3306,
-        'database' => 'texas_region_drive',
-        'username' => 'texas_user',
-        'password' => 'change_me',
+        'database' => 'tex',
+        'username' => 'root',
+        'password' => '',
     ],
     'google' => [
         'enabled' => false,

@@ -26,6 +26,4 @@ http://127.0.0.1:8000
 - Email: demo@texasdrive.app
 - Password: demo123
 
-## Notes
 
-This is a functional prototype rather than a production-ready Google OAuth integration. The Google sign-in flow is a lightweight demo that accepts a Gmail-style email and signs the user in locally.

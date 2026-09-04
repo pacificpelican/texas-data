@@ -186,20 +186,68 @@ function mysql_extension_available()
     return extension_loaded('mysqli') && function_exists('mysqli_init');
 }
 
+function set_last_mysql_connection_error($message)
+{
+    $GLOBALS['_last_mysql_connection_error'] = trim((string) $message);
+}
+
+function get_last_mysql_connection_error()
+{
+    return (string) ($GLOBALS['_last_mysql_connection_error'] ?? '');
+}
+
+function log_mysql_connection_failure($config, $message)
+{
+    static $logged = false;
+    if ($logged) {
+        return;
+    }
+
+    $logged = true;
+    $safeMessage = trim((string) $message);
+    if ($safeMessage === '') {
+        $safeMessage = 'Unknown MySQL connection error';
+    }
+
+    error_log(sprintf(
+        '[texas-data] MySQL unavailable: %s (host=%s port=%d db=%s user=%s)',
+        $safeMessage,
+        (string) ($config['host'] ?? ''),
+        (int) ($config['port'] ?? 0),
+        (string) ($config['database'] ?? ''),
+        (string) ($config['username'] ?? '')
+    ));
+}
+
+function fail_mysql_connection($connection, $config, $message)
+{
+    set_last_mysql_connection_error($message);
+    log_mysql_connection_failure($config, $message);
+    if ($connection instanceof mysqli) {
+        @mysqli_close($connection);
+    }
+
+    return null;
+}
+
 function get_mysql_connection()
 {
     $config = get_mysql_config();
+    set_last_mysql_connection_error('');
+
     if (!mysql_extension_available()) {
+        set_last_mysql_connection_error('mysqli extension missing');
         return null;
     }
 
     if (!$config['enabled'] || $config['host'] === '' || $config['username'] === '' || $config['database'] === '') {
+        set_last_mysql_connection_error('MySQL configuration is incomplete');
         return null;
     }
 
     $connection = @mysqli_init();
     if ($connection === false) {
-        return null;
+        return fail_mysql_connection(null, $config, 'mysqli_init failed');
     }
 
     $connection->options(MYSQLI_OPT_CONNECT_TIMEOUT, 3);
@@ -213,25 +261,25 @@ function get_mysql_connection()
 
         $fallback = @mysqli_real_connect($connection, $config['host'], $config['username'], $config['password'], null, $config['port']);
         if (!$fallback) {
-            @mysqli_close($connection);
-            return null;
+            return fail_mysql_connection($connection, $config, mysqli_connect_error() ?: 'MySQL connect failed');
         }
 
         $databaseName = mysqli_real_escape_string($connection, $config['database']);
         $ddl = "CREATE DATABASE IF NOT EXISTS `$databaseName`;";
         $createResult = mysqli_query($connection, $ddl);
         if ($createResult === false) {
-            @mysqli_close($connection);
-            return null;
+            return fail_mysql_connection($connection, $config, 'CREATE DATABASE failed: ' . (mysqli_error($connection) ?: 'unknown error'));
         }
 
-        mysqli_select_db($connection, $config['database']);
+        if (!mysqli_select_db($connection, $config['database'])) {
+            return fail_mysql_connection($connection, $config, 'Database select failed: ' . (mysqli_error($connection) ?: 'unknown error'));
+        }
+
         ensure_mysql_schema($connection);
 
         return $connection;
     } catch (mysqli_sql_exception $exception) {
-        @mysqli_close($connection);
-        return null;
+        return fail_mysql_connection($connection, $config, $exception->getMessage());
     }
 }
 
@@ -791,7 +839,7 @@ function get_storage_mode_status()
         return [
             'mode' => 'Files',
             'status' => 'fallback',
-            'detail' => 'MySQL configured but unavailable',
+            'detail' => 'MySQL configured but unavailable: ' . (get_last_mysql_connection_error() ?: 'unknown reason'),
         ];
     }
 
