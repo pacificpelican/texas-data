@@ -20,9 +20,19 @@ $question = trim((string) ($_POST['question'] ?? ''));
 $allSourceDocuments = collect_vault_documents();
 $sourceDocuments = collect_vault_documents($selectedRegion === '' ? null : $selectedRegion);
 $sourceDocumentsByRegion = [];
+$sourceFilesByRegion = [];
 foreach (array_keys(region_options()) as $regionKey) {
-    $sourceDocumentsByRegion[$regionKey] = collect_vault_documents($regionKey);
+    $documents = collect_vault_documents($regionKey);
+    $sourceDocumentsByRegion[$regionKey] = $documents;
+    $sourceFilesByRegion[$regionKey] = array_map(static fn($document) => [
+        'name' => (string) ($document['name'] ?? 'Untitled file'),
+        'region_label' => (string) ($document['region_label'] ?? 'Unknown region'),
+    ], $documents);
 }
+$allSourceFiles = array_map(static fn($document) => [
+    'name' => (string) ($document['name'] ?? 'Untitled file'),
+    'region_label' => (string) ($document['region_label'] ?? 'Unknown region'),
+], $allSourceDocuments);
 $storageStatus = get_storage_mode_status();
 $uploadsStatus = get_uploads_dir_status();
 $assistantReply = '';
@@ -121,7 +131,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="assistant-file-list">
                     <h3>Current source files</h3>
-                    <div id="source-files-container"></div>
+                    <div id="source-files-container">
+                        <?php if ($sourceDocuments === []): ?>
+                            <div class="ai-empty">No files are available in this region yet.</div>
+                        <?php else: ?>
+                            <ul>
+                                <?php foreach (array_slice($sourceDocuments, 0, 8) as $document): ?>
+                                    <li><?= htmlspecialchars((string) ($document['name'] ?? 'Untitled file'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars((string) ($document['region_label'] ?? 'Unknown region'), ENT_QUOTES, 'UTF-8') ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </aside>
 
@@ -143,8 +163,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         document.addEventListener('DOMContentLoaded', function () {
             var regionSelect = document.querySelector('select[name="region"]');
             var sourceContainer = document.getElementById('source-files-container');
-            var sourceFilesByRegion = <?php echo json_encode($sourceDocumentsByRegion, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
-            var allSourceFiles = <?php echo json_encode($allSourceDocuments, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            var sourceFilesByRegion = <?php echo json_encode($sourceFilesByRegion, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            var allSourceFiles = <?php echo json_encode($allSourceFiles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 
             function renderSourceFiles(regionKey) {
                 var files = regionKey ? (sourceFilesByRegion[regionKey] || []) : allSourceFiles;
