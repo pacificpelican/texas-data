@@ -972,6 +972,48 @@ function delete_user_uploads_and_account($user)
     return true;
 }
 
+function clear_all_uploaded_data()
+{
+    $payload = get_region_files();
+    $emptyPayload = [
+        'panhandle' => [],
+        'north' => [],
+        'central' => [],
+        'gulf' => [],
+        'south' => [],
+    ];
+
+    foreach ($payload as $region => $regionFiles) {
+        foreach ($regionFiles as $file) {
+            $relativePath = normalize_storage_relative_path((string) ($file['path'] ?? ''));
+            $absolutePath = $relativePath !== '' ? app_path($relativePath) : '';
+            if ($absolutePath !== '' && is_file($absolutePath)) {
+                @unlink($absolutePath);
+            }
+        }
+    }
+
+    $uploadsRoot = app_path('storage/uploads');
+    if (is_dir($uploadsRoot)) {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($uploadsRoot, FilesystemIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileInfo) {
+            $path = $fileInfo->getPathname();
+            if ($fileInfo->isDir()) {
+                @rmdir($path);
+            } else {
+                @unlink($path);
+            }
+        }
+    }
+
+    save_region_files($emptyPayload);
+    return true;
+}
+
 function all_region_files_for_vault()
 {
     $payload = get_region_files();

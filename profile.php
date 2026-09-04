@@ -12,6 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
     delete_user_uploads_and_account($user);
     redirect('logout.php');
 }
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data'])) {
+    clear_all_uploaded_data();
+    redirect('profile.php');
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -117,6 +122,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
             </div>
 
             <div class="delete-account">
+                <h3>Clear uploaded data only</h3>
+                <form method="post" onsubmit="return confirm('This removes all uploaded files and their metadata, but keeps every user account. Continue?');">
+                    <button type="submit" name="clear_uploaded_data" value="1">Clear all uploaded data</button>
+                </form>
+            </div>
+
+            <div class="delete-account" style="margin-top: 12px; border-color: rgba(189, 61, 61, 0.3);">
                 <h3>Delete this account and all uploaded files</h3>
                 <form method="post" onsubmit="return confirm('This will permanently delete your account and every file you uploaded. Continue?');">
                     <button type="submit" name="delete_account" value="1">Delete my account and uploads</button>

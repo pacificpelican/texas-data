@@ -1,118 +1,18 @@
 {
     "panhandle": [
         {
-            "id": "pan-01",
-            "name": "roadmap.pdf",
-            "size": 1048576,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-01T11:00:00Z"
-        },
-        {
-            "id": "pan-02",
-            "name": "community-site-plan.docx",
-            "size": 573440,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-01T12:30:00Z"
-        },
-        {
-            "id": "upload-6a99be1e928043.57554065",
-            "name": "pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_3.png",
-            "size": 2068601,
+            "id": "upload-6a9a5e00e20667.24628658",
+            "name": "A_North_Cascades_Mystery.txt",
+            "size": 21784,
             "uploaded_by": "Mack Johnson",
-            "uploaded_at": "2026-09-03T18:36:14+00:00",
-            "path": "C:\\Users\\d\\texas-region-drive\\includes/..\\storage/uploads/panhandle\\file-6a99be1e926942.17440637-pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_3.png"
-        },
-        {
-            "id": "upload-6a99bf7c65cfa3.50502431",
-            "name": "texas-upload-test.txt",
-            "size": 33,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-03T18:42:04+00:00",
-            "path": "storage/uploads/panhandle/file-6a99bf7c65ac33.47033145-texas-upload-test.txt"
-        },
-        {
-            "id": "upload-6a99bf9264f2f0.55756184",
-            "name": "texas-upload-test.txt",
-            "size": 33,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-03T18:42:26+00:00",
-            "path": "storage/uploads/panhandle/file-6a99bf9264dca4.71722424-texas-upload-test.txt"
-        },
-        {
-            "id": "upload-6a9a27c5210570.31235526",
-            "name": "pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_0.png",
-            "size": 1905915,
-            "uploaded_by": "Mack Johnson",
-            "uploaded_at": "2026-09-04 02:07:01",
-            "path": "storage/uploads/panhandle/file-6a9a27c520d1c7.56181334-pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_6cb63f2f-103d-4f1d-829f-1845bbb9ed53_0.png"
-        },
-        {
-            "id": "upload-6a9a2c22f15c33.53606743",
-            "name": "pacificpelican_Tahoe_Otters_Gonna_Get_Ya_poster_based_on_the__833f9723-f83d-48c5-b130-2f4b55ab31cd_2.png",
-            "size": 1457574,
-            "uploaded_by": "Mack Johnson",
-            "uploaded_at": "2026-09-04 02:25:38",
-            "path": "storage/uploads/panhandle/file-6a9a2c22f11606.87243093-pacificpelican_Tahoe_Otters_Gonna_Get_Ya_poster_based_on_the__833f9723-f83d-48c5-b130-2f4b55ab31cd_2.png"
+            "uploaded_by_id": "user-6a99be109d2b1",
+            "uploaded_by_email": "2020@sf3am.com",
+            "uploaded_at": "2026-09-04 05:58:24",
+            "path": "storage/uploads/panhandle/file-6a9a5e00e1e468.88002034-A_North_Cascades_Mystery.txt"
         }
     ],
-    "north": [
-        {
-            "id": "north-01",
-            "name": "construction-timeline.xlsx",
-            "size": 833536,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-02T09:45:00Z"
-        }
-    ],
-    "central": [
-        {
-            "id": "central-01",
-            "name": "regional-budget.csv",
-            "size": 327680,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-03T08:15:00Z"
-        }
-    ],
-    "gulf": [
-        {
-            "id": "gulf-01",
-            "name": "coastal-incident-report.pdf",
-            "size": 2097152,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-03T14:00:00Z"
-        },
-        {
-            "id": "upload-6a9a470c8287a3.02893842",
-            "name": "pacificpelican_cartoon_Irish_setter_at_the_wheel_of_an_old_sh_49c0507a-d2d5-4903-b4fe-ff3ada92412e_0.png",
-            "size": 316896,
-            "uploaded_by": "Mack Johnson",
-            "uploaded_at": "2026-09-04 04:20:28",
-            "path": "storage/uploads/gulf/file-6a9a470c827798.99435279-pacificpelican_cartoon_Irish_setter_at_the_wheel_of_an_old_sh_49c0507a-d2d5-4903-b4fe-ff3ada92412e_0.png"
-        },
-        {
-            "id": "upload-6a9a4f94a4e8e2.17639264",
-            "name": "Mystery_of_the_Cascades--1-.txt",
-            "size": 997,
-            "uploaded_by": "Mack Johnson",
-            "uploaded_at": "2026-09-04 04:56:52",
-            "path": "storage/uploads/gulf/file-6a9a4f94a4c306.89123700-Mystery_of_the_Cascades--1-.txt"
-        }
-    ],
-    "south": [
-        {
-            "id": "south-01",
-            "name": "border-logistics.xlsx",
-            "size": 687872,
-            "uploaded_by": "Demo User",
-            "uploaded_at": "2026-09-02T16:30:00Z"
-        },
-        {
-            "id": "upload-6a99bcb66133b3.83317925",
-            "name": "pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_c751276e-6a83-45de-b803-fb85553c01ae_2.png",
-            "size": 2075381,
-            "uploaded_by": "pacificpelican",
-            "uploaded_at": "2026-09-03T18:30:14+00:00",
-            "path": "C:\\Users\\d\\texas-region-drive\\includes/..\\storage/uploads/south\\file-6a99bcb6611b34.17915404-pacificpelican_poster_with_big_yellow_letters_Sea_Lions_are_i_c751276e-6a83-45de-b803-fb85553c01ae_2.png"
-        }
-    ]
+    "north": [],
+    "central": [],
+    "gulf": [],
+    "south": []
 }
