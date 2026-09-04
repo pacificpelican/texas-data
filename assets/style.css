@@ -344,6 +344,8 @@ button.google {
 .map-region polygon {
     stroke: rgba(17, 35, 52, 0.8);
     stroke-width: 2;
+    stroke-linejoin: round;
+    stroke-linecap: round;
     transition: fill 0.2s ease;
 }
 

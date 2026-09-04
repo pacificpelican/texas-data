@@ -93,19 +93,19 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
 
                 <svg class="map-svg" viewBox="0 0 500 620" role="img" aria-label="Texas map divided into five regions">
                     <a class="map-region region-1 <?= $selectedRegion === 'panhandle' ? 'active' : '' ?>" href="dashboard.php?region=panhandle">
-                        <polygon points="140,50 360,50 410,190 310,220 135,175" />
+                        <polygon points="130,48 335,42 390,78 420,145 405,198 327,226 250,214 170,202 120,165 108,110" />
                     </a>
                     <a class="map-region region-2 <?= $selectedRegion === 'north' ? 'active' : '' ?>" href="dashboard.php?region=north">
-                        <polygon points="150,185 325,185 390,340 265,420 120,350" />
+                        <polygon points="145,180 272,170 344,202 392,286 383,356 322,408 258,430 195,398 128,346 116,258" />
                     </a>
                     <a class="map-region region-3 <?= $selectedRegion === 'central' ? 'active' : '' ?>" href="dashboard.php?region=central">
-                        <polygon points="135,340 275,420 355,560 240,610 100,530" />
+                        <polygon points="140,335 250,324 332,385 362,472 352,558 244,610 180,592 118,525 100,438 116,372" />
                     </a>
                     <a class="map-region region-4 <?= $selectedRegion === 'gulf' ? 'active' : '' ?>" href="dashboard.php?region=gulf">
-                        <polygon points="80,430 200,360 285,470 230,610 90,610" />
+                        <polygon points="78,430 140,368 197,360 248,392 230,610 142,610 92,576 60,514" />
                     </a>
                     <a class="map-region region-5 <?= $selectedRegion === 'south' ? 'active' : '' ?>" href="dashboard.php?region=south">
-                        <polygon points="90,240 180,180 210,300 140,430 35,370" />
+                        <polygon points="95,242 160,180 220,200 212,300 158,418 80,394 36,316 42,272" />
                     </a>
 
                     <g font-size="16" font-weight="700" fill="#163d68">
