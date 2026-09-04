@@ -36,6 +36,13 @@ header.topbar {
     gap: 16px;
 }
 
+.topbar-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
 .brand {
     display: flex;
     align-items: center;
@@ -70,6 +77,70 @@ header.topbar {
     color: var(--ink);
     text-decoration: none;
     font-weight: 600;
+}
+
+.debug-panel {
+    display: grid;
+    gap: 8px;
+    background: rgba(13, 39, 68, 0.96);
+    color: #eef6ff;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    padding: 10px 12px;
+    min-width: 250px;
+    box-shadow: 0 12px 28px rgba(8, 21, 36, 0.18);
+}
+
+.debug-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.82rem;
+}
+
+.debug-label {
+    color: rgba(238, 246, 255, 0.8);
+    font-weight: 600;
+}
+
+.debug-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 92px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.76rem;
+}
+
+.debug-pill.good {
+    background: rgba(63, 180, 116, 0.18);
+    color: #9ae6b4;
+}
+
+.debug-pill.warn {
+    background: rgba(255, 180, 60, 0.18);
+    color: #ffd789;
+}
+
+.debug-pill.info {
+    background: rgba(82, 130, 255, 0.18);
+    color: #b9d0ff;
+}
+
+.hard-refresh {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: linear-gradient(135deg, #2c6bd8, #174ea6);
+    color: white;
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 2px;
 }
 
 .auth-shell {

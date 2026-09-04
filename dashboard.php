@@ -7,6 +7,8 @@ $selectedRegion = sanitize_region_key($_GET['region'] ?? 'panhandle');
 $regionMap = region_options();
 $filesByRegion = get_region_files();
 $errors = [];
+$storageStatus = get_storage_mode_status();
+$uploadsStatus = get_uploads_dir_status();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
     $targetRegion = sanitize_region_key((string) ($_POST['region'] ?? 'panhandle'));
@@ -62,9 +64,23 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
                 <span>Texas Regional Vault</span>
             </div>
 
-            <div class="user-chip">
-                <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
-                <a href="logout.php">Log out</a>
+            <div class="topbar-right">
+                <div class="user-chip">
+                    <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <a href="logout.php">Log out</a>
+                </div>
+
+                <div class="debug-panel" aria-live="polite">
+                    <div class="debug-row">
+                        <span class="debug-label">Data:</span>
+                        <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="debug-row">
+                        <span class="debug-label">Uploads:</span>
+                        <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?region=<?= rawurlencode($selectedRegion) ?>&refresh=' + Date.now();">Hard refresh</button>
+                </div>
             </div>
         </header>
 

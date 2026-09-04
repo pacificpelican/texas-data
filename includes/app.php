@@ -751,3 +751,67 @@ function append_region_file($regionKey, $payload)
     $files[$regionKey][] = $payload;
     return save_region_files($files);
 }
+
+function get_storage_mode_status()
+{
+    $mysqlConfig = get_mysql_config();
+    if (!empty($mysqlConfig['enabled'])) {
+        $connection = get_mysql_connection();
+        if ($connection) {
+            mysqli_close($connection);
+            return [
+                'mode' => 'MySQL',
+                'status' => 'active',
+                'detail' => 'configured and connected',
+            ];
+        }
+
+        return [
+            'mode' => 'Files',
+            'status' => 'fallback',
+            'detail' => 'MySQL configured but unavailable',
+        ];
+    }
+
+    return [
+        'mode' => 'Files',
+        'status' => 'default',
+        'detail' => 'JSON data store is active',
+    ];
+}
+
+function get_uploads_dir_status()
+{
+    $directory = app_path('storage/uploads');
+    if (!is_dir($directory)) {
+        if (!mkdir($directory, 0777, true) && !is_dir($directory)) {
+            return [
+                'path' => $directory,
+                'status' => 'missing',
+                'detail' => 'directory could not be created',
+            ];
+        }
+    }
+
+    if (!is_dir($directory)) {
+        return [
+            'path' => $directory,
+            'status' => 'missing',
+            'detail' => 'not a valid directory',
+        ];
+    }
+
+    if (!is_writable($directory)) {
+        return [
+            'path' => $directory,
+            'status' => 'blocked',
+            'detail' => 'read-only or not writable by PHP',
+        ];
+    }
+
+    return [
+        'path' => $directory,
+        'status' => 'ready',
+        'detail' => 'writable by PHP',
+    ];
+}
