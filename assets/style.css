@@ -79,6 +79,33 @@ header.topbar {
     font-weight: 600;
 }
 
+.debug-shell {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.debug-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 86px;
+    padding: 8px 12px;
+    border: 1px solid rgba(21, 76, 155, 0.25);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fbff, #dfeeff);
+    color: var(--primary);
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(21, 76, 155, 0.12);
+}
+
+.debug-toggle.is-open {
+    background: linear-gradient(135deg, #dfeeff, #cfe0ff);
+}
+
 .debug-panel {
     display: grid;
     gap: 8px;
@@ -89,6 +116,15 @@ header.topbar {
     padding: 10px 12px;
     min-width: 250px;
     box-shadow: 0 12px 28px rgba(8, 21, 36, 0.18);
+    display: none;
+}
+
+.debug-panel[hidden] {
+    display: none !important;
+}
+
+.debug-shell .debug-panel:not([hidden]) {
+    display: grid;
 }
 
 .debug-row {
@@ -317,6 +353,12 @@ button.google {
     padding: 18px;
 }
 
+.map-svg {
+    padding: 10px 12px 6px;
+    background: linear-gradient(180deg, #edf5ff 0%, #f7fafc 100%);
+    border-radius: 18px;
+}
+
 .map-header {
     padding: 8px 8px 18px;
     display: flex;
@@ -353,6 +395,7 @@ button.google {
     stroke-linejoin: round;
     stroke-linecap: round;
     transition: fill 0.2s ease;
+    vector-effect: non-scaling-stroke;
 }
 
 .map-region.active polygon {

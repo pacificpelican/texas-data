@@ -86,16 +86,19 @@ if (isset($_GET['error'])) {
                     Need an account? <a href="signup.php">Create one</a>
                 </p>
 
-                <div class="debug-panel auth-debug-panel" aria-live="polite">
-                    <div class="debug-row">
-                        <span class="debug-label">Data:</span>
-                        <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                <div class="debug-shell auth-debug-shell">
+                    <button type="button" class="debug-toggle" aria-controls="login-debug-panel" aria-expanded="false">🪲</button>
+                    <div id="login-debug-panel" class="debug-panel auth-debug-panel" aria-live="polite" hidden>
+                        <div class="debug-row">
+                            <span class="debug-label">Data:</span>
+                            <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <div class="debug-row">
+                            <span class="debug-label">Uploads:</span>
+                            <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?refresh=' + Date.now();">Hard refresh</button>
                     </div>
-                    <div class="debug-row">
-                        <span class="debug-label">Uploads:</span>
-                        <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
-                    </div>
-                    <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?refresh=' + Date.now();">Hard refresh</button>
                 </div>
 
                 <div class="divider">or</div>
@@ -112,5 +115,23 @@ if (isset($_GET['error'])) {
             </div>
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.debug-toggle').forEach(function (button) {
+                var panel = document.getElementById(button.getAttribute('aria-controls'));
+                if (!panel) {
+                    return;
+                }
+
+                button.addEventListener('click', function () {
+                    var isOpen = !panel.hidden;
+                    panel.hidden = isOpen;
+                    button.setAttribute('aria-expanded', String(!isOpen));
+                    button.classList.toggle('is-open', !isOpen);
+                });
+            });
+        });
+    </script>
 </body>
 </html>

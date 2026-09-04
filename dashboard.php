@@ -70,16 +70,19 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
                     <a href="logout.php">Log out</a>
                 </div>
 
-                <div class="debug-panel" aria-live="polite">
-                    <div class="debug-row">
-                        <span class="debug-label">Data:</span>
-                        <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                <div class="debug-shell">
+                    <button type="button" class="debug-toggle" aria-controls="dashboard-debug-panel" aria-expanded="false">🪲</button>
+                    <div id="dashboard-debug-panel" class="debug-panel" aria-live="polite" hidden>
+                        <div class="debug-row">
+                            <span class="debug-label">Data:</span>
+                            <span class="debug-pill <?= $storageStatus['status'] === 'active' ? 'good' : ($storageStatus['status'] === 'fallback' ? 'warn' : 'info') ?>"><?= htmlspecialchars($storageStatus['mode'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <div class="debug-row">
+                            <span class="debug-label">Uploads:</span>
+                            <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                        </div>
+                        <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?region=<?= rawurlencode($selectedRegion) ?>&refresh=' + Date.now();">Hard refresh</button>
                     </div>
-                    <div class="debug-row">
-                        <span class="debug-label">Uploads:</span>
-                        <span class="debug-pill <?= $uploadsStatus['status'] === 'ready' ? 'good' : ($uploadsStatus['status'] === 'blocked' ? 'warn' : 'info') ?>"><?= htmlspecialchars($uploadsStatus['status'], ENT_QUOTES, 'UTF-8') ?></span>
-                    </div>
-                    <button type="button" class="hard-refresh" onclick="window.location.href = window.location.pathname + '?region=<?= rawurlencode($selectedRegion) ?>&refresh=' + Date.now();">Hard refresh</button>
                 </div>
             </div>
         </header>
@@ -93,19 +96,19 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
 
                 <svg class="map-svg" viewBox="0 0 500 620" role="img" aria-label="Texas map divided into five regions">
                     <a class="map-region region-1 <?= $selectedRegion === 'panhandle' ? 'active' : '' ?>" href="dashboard.php?region=panhandle">
-                        <polygon points="130,48 335,42 390,78 420,145 405,198 327,226 250,214 170,202 120,165 108,110" />
+                        <polygon points="118,40 332,32 390,70 418,126 404,188 332,226 246,216 166,204 108,168 92,104" />
                     </a>
                     <a class="map-region region-2 <?= $selectedRegion === 'north' ? 'active' : '' ?>" href="dashboard.php?region=north">
-                        <polygon points="145,180 272,170 344,202 392,286 383,356 322,408 258,430 195,398 128,346 116,258" />
+                        <polygon points="170,178 282,166 344,210 396,290 382,360 330,410 268,432 196,402 130,346 116,272" />
                     </a>
                     <a class="map-region region-3 <?= $selectedRegion === 'central' ? 'active' : '' ?>" href="dashboard.php?region=central">
-                        <polygon points="140,335 250,324 332,385 362,472 352,558 244,610 180,592 118,525 100,438 116,372" />
+                        <polygon points="160,338 250,328 332,392 358,474 344,560 242,610 178,594 118,528 100,448 114,382" />
                     </a>
                     <a class="map-region region-4 <?= $selectedRegion === 'gulf' ? 'active' : '' ?>" href="dashboard.php?region=gulf">
-                        <polygon points="78,430 140,368 197,360 248,392 230,610 142,610 92,576 60,514" />
+                        <polygon points="64,438 122,378 192,366 240,392 220,610 146,610 90,580 52,514" />
                     </a>
                     <a class="map-region region-5 <?= $selectedRegion === 'south' ? 'active' : '' ?>" href="dashboard.php?region=south">
-                        <polygon points="95,242 160,180 220,200 212,300 158,418 80,394 36,316 42,272" />
+                        <polygon points="82,242 150,182 220,198 214,298 162,426 78,396 30,320 34,276" />
                     </a>
 
                     <g font-size="16" font-weight="700" fill="#163d68">
@@ -155,5 +158,23 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
             </aside>
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.debug-toggle').forEach(function (button) {
+                var panel = document.getElementById(button.getAttribute('aria-controls'));
+                if (!panel) {
+                    return;
+                }
+
+                button.addEventListener('click', function () {
+                    var isOpen = !panel.hidden;
+                    panel.hidden = isOpen;
+                    button.setAttribute('aria-expanded', String(!isOpen));
+                    button.classList.toggle('is-open', !isOpen);
+                });
+            });
+        });
+    </script>
 </body>
 </html>
