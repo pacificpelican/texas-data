@@ -776,6 +776,11 @@ function save_region_files($payload)
 
 function sanitize_region_key($value)
 {
+    $value = trim((string) $value);
+    if ($value === '') {
+        return '';
+    }
+
     $regions = array_keys(region_options());
     return in_array($value, $regions, true) ? $value : 'panhandle';
 }

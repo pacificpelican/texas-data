@@ -3,8 +3,14 @@ require_once __DIR__ . '/includes/app.php';
 require_login();
 
 $user = current_user();
-$currentRegion = sanitize_region_key((string) ($_GET['region'] ?? 'panhandle'));
-$selectedRegion = sanitize_region_key((string) ($_POST['region'] ?? $currentRegion));
+$currentRegion = isset($_GET['region']) ? sanitize_region_key((string) $_GET['region']) : 'panhandle';
+if ($currentRegion === '') {
+    $currentRegion = '';
+}
+$selectedRegion = isset($_POST['region']) ? sanitize_region_key((string) $_POST['region']) : $currentRegion;
+if ($selectedRegion === '') {
+    $selectedRegion = '';
+}
 $task = 'summary';
 if (isset($_POST['task']) && in_array((string) $_POST['task'], ['summary', 'story', 'confirmation', 'rebuttal'], true)) {
     $task = (string) $_POST['task'];
