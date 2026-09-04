@@ -181,9 +181,18 @@ function fetch_google_userinfo($accessToken)
     return $decoded;
 }
 
+function mysql_extension_available()
+{
+    return extension_loaded('mysqli') && function_exists('mysqli_init');
+}
+
 function get_mysql_connection()
 {
     $config = get_mysql_config();
+    if (!mysql_extension_available()) {
+        return null;
+    }
+
     if (!$config['enabled'] || $config['host'] === '' || $config['username'] === '' || $config['database'] === '') {
         return null;
     }
@@ -756,6 +765,14 @@ function get_storage_mode_status()
 {
     $mysqlConfig = get_mysql_config();
     if (!empty($mysqlConfig['enabled'])) {
+        if (!mysql_extension_available()) {
+            return [
+                'mode' => 'Files',
+                'status' => 'fallback',
+                'detail' => 'mysqli extension missing',
+            ];
+        }
+
         $connection = get_mysql_connection();
         if ($connection) {
             mysqli_close($connection);
