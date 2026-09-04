@@ -705,8 +705,125 @@ button.google {
     font-weight: 700;
 }
 
+.profile-page {
+    display: grid;
+    gap: 20px;
+}
+
+.profile-panel {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    padding: 22px 20px;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.profile-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 2.6rem);
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 20px;
+}
+
+.profile-card,
+.profile-files {
+    background: #f9fbff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 18px;
+}
+
+.profile-card h2,
+.profile-files h2 {
+    margin-top: 0;
+    margin-bottom: 14px;
+}
+
+.profile-meta {
+    display: grid;
+    gap: 12px;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+}
+
+.profile-row strong {
+    color: var(--ink);
+}
+
+.profile-files ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.profile-files li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+}
+
+.profile-file-main {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.profile-file-main strong {
+    color: var(--ink);
+}
+
+.profile-file-main small {
+    color: var(--muted);
+}
+
+.delete-account {
+    margin-top: 18px;
+    background: rgba(189, 61, 61, 0.06);
+    border: 1px solid rgba(189, 61, 61, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+}
+
+.delete-account h3 {
+    margin-top: 0;
+    color: #7f2b2b;
+}
+
+.delete-account button {
+    background: var(--danger);
+    color: white;
+    width: 100%;
+}
+
 @media (max-width: 900px) {
-    .auth-grid, .dashboard-layout {
+    .auth-grid, .dashboard-layout, .profile-grid {
         grid-template-columns: 1fr;
     }
 

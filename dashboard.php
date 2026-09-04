@@ -33,6 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
                 'name' => $safeName,
                 'size' => filesize($destination),
                 'uploaded_by' => $user['name'],
+                'uploaded_by_id' => (string) ($user['id'] ?? ''),
+                'uploaded_by_email' => strtolower((string) ($user['email'] ?? '')),
                 'uploaded_at' => normalize_mysql_datetime(gmdate('c')),
                 'path' => $relativePath,
             ];
@@ -69,6 +71,7 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
             <div class="topbar-right">
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
+                    <a href="profile.php">Profile</a>
                     <a href="assistant.php">AI Assistant</a>
                     <a href="logout.php">Log out</a>
                 </div>

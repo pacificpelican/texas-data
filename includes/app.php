@@ -283,6 +283,24 @@ function get_mysql_connection()
     }
 }
 
+function mysql_column_exists($connection, $tableName, $columnName)
+{
+    if (!($connection instanceof mysqli)) {
+        return false;
+    }
+
+    $safeTable = mysqli_real_escape_string($connection, (string) $tableName);
+    $safeColumn = mysqli_real_escape_string($connection, (string) $columnName);
+    $result = mysqli_query($connection, "SHOW COLUMNS FROM `$safeTable` LIKE '$safeColumn';");
+    if ($result === false) {
+        return false;
+    }
+
+    $hasColumn = mysqli_num_rows($result) > 0;
+    mysqli_free_result($result);
+    return $hasColumn;
+}
+
 function ensure_mysql_schema($connection)
 {
     if (!($connection instanceof mysqli)) {
@@ -295,7 +313,8 @@ function ensure_mysql_schema($connection)
             name VARCHAR(255) NOT NULL,
             email VARCHAR(255) NOT NULL UNIQUE,
             password VARCHAR(255) DEFAULT NULL,
-            provider VARCHAR(50) NOT NULL DEFAULT 'email'
+            provider VARCHAR(50) NOT NULL DEFAULT 'email',
+            created_at DATETIME DEFAULT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ";
 
@@ -306,6 +325,8 @@ function ensure_mysql_schema($connection)
             name VARCHAR(255) NOT NULL,
             size BIGINT NOT NULL DEFAULT 0,
             uploaded_by VARCHAR(255) NOT NULL,
+            uploaded_by_id VARCHAR(255) DEFAULT NULL,
+            uploaded_by_email VARCHAR(255) DEFAULT NULL,
             uploaded_at DATETIME NOT NULL,
             path VARCHAR(500) NOT NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -313,6 +334,18 @@ function ensure_mysql_schema($connection)
 
     mysqli_query($connection, $userSql);
     mysqli_query($connection, $regionSql);
+
+    if (!mysql_column_exists($connection, 'users', 'created_at')) {
+        mysqli_query($connection, 'ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT NULL;');
+    }
+
+    if (!mysql_column_exists($connection, 'region_files', 'uploaded_by_id')) {
+        mysqli_query($connection, 'ALTER TABLE region_files ADD COLUMN uploaded_by_id VARCHAR(255) DEFAULT NULL;');
+    }
+
+    if (!mysql_column_exists($connection, 'region_files', 'uploaded_by_email')) {
+        mysqli_query($connection, 'ALTER TABLE region_files ADD COLUMN uploaded_by_email VARCHAR(255) DEFAULT NULL;');
+    }
 }
 
 function app_path($path = '')
@@ -422,6 +455,7 @@ function default_user_list()
             'email' => 'demo@texasdrive.app',
             'password' => password_hash('demo123', PASSWORD_DEFAULT),
             'provider' => 'email',
+            'created_at' => gmdate('c'),
         ],
     ];
 }
@@ -440,7 +474,7 @@ function get_users()
 {
     $connection = get_mysql_connection();
     if ($connection) {
-        $query = mysqli_query($connection, "SELECT id, name, email, password, provider FROM users");
+        $query = mysqli_query($connection, "SELECT id, name, email, password, provider, created_at FROM users");
         $users = [];
         if ($query) {
             while ($row = mysqli_fetch_assoc($query)) {
@@ -450,6 +484,7 @@ function get_users()
                     'email' => (string) $row['email'],
                     'password' => $row['password'] ?? null,
                     'provider' => $row['provider'] ?? 'email',
+                    'created_at' => $row['created_at'] ?? null,
                 ];
             }
         }
@@ -465,7 +500,14 @@ function get_users()
     }
 
     ensure_initial_users();
-    return read_json_file(app_path('data/users.json'), []);
+    $users = read_json_file(app_path('data/users.json'), []);
+    foreach ($users as $index => $user) {
+        if (!isset($users[$index]['created_at'])) {
+            $users[$index]['created_at'] = gmdate('c');
+        }
+    }
+
+    return $users;
 }
 
 function save_users($users)
@@ -479,14 +521,16 @@ function save_users($users)
             $escapedPassword = $user['password'] ?? null;
             $escapedPassword = $escapedPassword === null ? 'NULL' : "'" . mysqli_real_escape_string($connection, (string) $escapedPassword) . "'";
             $provider = mysqli_real_escape_string($connection, (string) (($user['provider'] ?? 'email')));
+            $createdAt = mysqli_real_escape_string($connection, normalize_mysql_datetime((string) ($user['created_at'] ?? gmdate('c'))));
             $sql = "
-                INSERT INTO users (id, name, email, password, provider)
-                VALUES ('$escapedId', '$escapedName', '$escapedEmail', $escapedPassword, '$provider')
+                INSERT INTO users (id, name, email, password, provider, created_at)
+                VALUES ('$escapedId', '$escapedName', '$escapedEmail', $escapedPassword, '$provider', '$createdAt')
                 ON DUPLICATE KEY UPDATE
                     name = VALUES(name),
                     email = VALUES(email),
                     password = VALUES(password),
-                    provider = VALUES(provider)
+                    provider = VALUES(provider),
+                    created_at = VALUES(created_at)
             ";
             mysqli_query($connection, $sql);
         }
@@ -549,6 +593,7 @@ function ensure_google_user($email, $name = null)
         'name' => $friendlyName,
         'email' => $email,
         'provider' => 'google',
+        'created_at' => gmdate('c'),
     ];
 
     $users[] = $newUser;
@@ -593,6 +638,7 @@ function create_email_account($name, $email, $password)
         'email' => $email,
         'password' => password_hash($password, PASSWORD_DEFAULT),
         'provider' => 'email',
+        'created_at' => gmdate('c'),
     ];
 
     $users[] = $newUser;
@@ -681,7 +727,7 @@ function get_region_files()
 {
     $connection = get_mysql_connection();
     if ($connection) {
-        $query = mysqli_query($connection, "SELECT region, id, name, size, uploaded_by, uploaded_at, path FROM region_files ORDER BY uploaded_at DESC");
+        $query = mysqli_query($connection, "SELECT region, id, name, size, uploaded_by, uploaded_by_id, uploaded_by_email, uploaded_at, path FROM region_files ORDER BY uploaded_at DESC");
         $payload = [
             'panhandle' => [],
             'north' => [],
@@ -702,6 +748,8 @@ function get_region_files()
                     'name' => (string) $row['name'],
                     'size' => (int) $row['size'],
                     'uploaded_by' => (string) $row['uploaded_by'],
+                    'uploaded_by_id' => (string) ($row['uploaded_by_id'] ?? ''),
+                    'uploaded_by_email' => (string) ($row['uploaded_by_email'] ?? ''),
                     'uploaded_at' => (string) $row['uploaded_at'],
                     'path' => (string) $row['path'],
                 ];
@@ -748,18 +796,22 @@ function save_region_files($payload)
                 $name = mysqli_real_escape_string($connection, (string) ($file['name'] ?? 'untitled'));
                 $size = (int) ($file['size'] ?? 0);
                 $uploadedBy = mysqli_real_escape_string($connection, (string) ($file['uploaded_by'] ?? 'Unknown'));
+                $uploadedById = mysqli_real_escape_string($connection, (string) ($file['uploaded_by_id'] ?? ''));
+                $uploadedByEmail = mysqli_real_escape_string($connection, strtolower((string) ($file['uploaded_by_email'] ?? '')));
                 $uploadedAt = mysqli_real_escape_string($connection, normalize_mysql_datetime((string) ($file['uploaded_at'] ?? gmdate('Y-m-d H:i:s'))));
                 $path = mysqli_real_escape_string($connection, normalize_storage_relative_path((string) ($file['path'] ?? '')));
                 $regionKey = mysqli_real_escape_string($connection, sanitize_region_key((string) $region));
 
                 $sql = "
-                    INSERT INTO region_files (id, region, name, size, uploaded_by, uploaded_at, path)
-                    VALUES ('$id', '$regionKey', '$name', $size, '$uploadedBy', '$uploadedAt', '$path')
+                    INSERT INTO region_files (id, region, name, size, uploaded_by, uploaded_by_id, uploaded_by_email, uploaded_at, path)
+                    VALUES ('$id', '$regionKey', '$name', $size, '$uploadedBy', '$uploadedById', '$uploadedByEmail', '$uploadedAt', '$path')
                     ON DUPLICATE KEY UPDATE
                         region = VALUES(region),
                         name = VALUES(name),
                         size = VALUES(size),
                         uploaded_by = VALUES(uploaded_by),
+                        uploaded_by_id = VALUES(uploaded_by_id),
+                        uploaded_by_email = VALUES(uploaded_by_email),
                         uploaded_at = VALUES(uploaded_at),
                         path = VALUES(path)
                 ";
@@ -817,6 +869,107 @@ function infer_file_type_label($fileName)
     ];
 
     return $map[$extension] ?? ($extension !== '' ? strtoupper($extension) : 'Unknown');
+}
+
+function user_uploaded_files($user)
+{
+    $payload = get_region_files();
+    $userId = strtolower((string) ($user['id'] ?? ''));
+    $userEmail = strtolower((string) ($user['email'] ?? ''));
+    $userName = trim((string) ($user['name'] ?? ''));
+    $files = [];
+
+    foreach ($payload as $region => $regionFiles) {
+        foreach ($regionFiles as $file) {
+            $uploadedById = strtolower((string) ($file['uploaded_by_id'] ?? ''));
+            $uploadedByEmail = strtolower((string) ($file['uploaded_by_email'] ?? ''));
+            $uploadedByName = trim((string) ($file['uploaded_by'] ?? ''));
+
+            $matchesUser = ($userId !== '' && $uploadedById === $userId)
+                || ($userEmail !== '' && $uploadedByEmail === $userEmail)
+                || ($userName !== '' && $uploadedByName === $userName);
+
+            if (!$matchesUser) {
+                continue;
+            }
+
+            $regionKey = sanitize_region_key((string) $region);
+            $files[] = [
+                'id' => (string) ($file['id'] ?? uniqid('vault-', true)),
+                'name' => (string) ($file['name'] ?? 'untitled'),
+                'size' => (int) ($file['size'] ?? 0),
+                'uploaded_by' => (string) ($file['uploaded_by'] ?? $userName),
+                'uploaded_at' => (string) ($file['uploaded_at'] ?? gmdate('c')),
+                'region' => $regionKey,
+                'region_label' => region_label($regionKey),
+                'path' => normalize_storage_relative_path((string) ($file['path'] ?? '')),
+                'type' => infer_file_type_label((string) ($file['name'] ?? 'untitled')) . ' (inferred)',
+            ];
+        }
+    }
+
+    usort($files, static fn($a, $b) => strtotime((string) $b['uploaded_at']) <=> strtotime((string) $a['uploaded_at']));
+
+    return $files;
+}
+
+function delete_user_uploads_and_account($user)
+{
+    $userId = strtolower((string) ($user['id'] ?? ''));
+    $userEmail = strtolower((string) ($user['email'] ?? ''));
+    $userName = trim((string) ($user['name'] ?? ''));
+
+    $payload = get_region_files();
+    $updatedPayload = [];
+
+    foreach ($payload as $region => $regionFiles) {
+        $filteredFiles = [];
+        foreach ($regionFiles as $file) {
+            $uploadedById = strtolower((string) ($file['uploaded_by_id'] ?? ''));
+            $uploadedByEmail = strtolower((string) ($file['uploaded_by_email'] ?? ''));
+            $uploadedByName = trim((string) ($file['uploaded_by'] ?? ''));
+
+            $matchesUser = ($userId !== '' && $uploadedById === $userId)
+                || ($userEmail !== '' && $uploadedByEmail === $userEmail)
+                || ($userName !== '' && $uploadedByName === $userName);
+
+            if ($matchesUser) {
+                $relativePath = normalize_storage_relative_path((string) ($file['path'] ?? ''));
+                $absolutePath = $relativePath !== '' ? app_path($relativePath) : '';
+                if ($absolutePath !== '' && is_file($absolutePath)) {
+                    @unlink($absolutePath);
+                }
+                continue;
+            }
+
+            $filteredFiles[] = $file;
+        }
+
+        $updatedPayload[$region] = $filteredFiles;
+    }
+
+    save_region_files($updatedPayload);
+
+    $users = get_users();
+    $filteredUsers = [];
+    foreach ($users as $storedUser) {
+        $storedId = strtolower((string) ($storedUser['id'] ?? ''));
+        $storedEmail = strtolower((string) ($storedUser['email'] ?? ''));
+        $storedName = trim((string) ($storedUser['name'] ?? ''));
+
+        $sameUser = ($userId !== '' && $storedId === $userId)
+            || ($userEmail !== '' && $storedEmail === $userEmail)
+            || ($userName !== '' && $storedName === $userName);
+
+        if (!$sameUser) {
+            $filteredUsers[] = $storedUser;
+        }
+    }
+
+    save_users($filteredUsers);
+
+    unset($_SESSION['user']);
+    return true;
 }
 
 function all_region_files_for_vault()
