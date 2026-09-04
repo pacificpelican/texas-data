@@ -51,6 +51,12 @@ header.topbar {
     letter-spacing: 0.02em;
 }
 
+.brand-link {
+    display: inline-flex;
+    text-decoration: none;
+    color: inherit;
+}
+
 .brand-mark {
     width: 42px;
     height: 42px;
@@ -490,6 +496,121 @@ button.google {
     border: 1px dashed var(--line);
     border-radius: 12px;
     background: rgba(81, 136, 203, 0.03);
+}
+
+.vault-page {
+    display: grid;
+    gap: 18px;
+}
+
+.vault-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.vault-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 3vw, 2.6rem);
+}
+
+.vault-panel {
+    background: rgba(255, 255, 255, 0.82);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.vault-table-wrap {
+    overflow-x: auto;
+}
+
+.vault-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.vault-table th,
+.vault-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+}
+
+.vault-table th {
+    background: #f4f8ff;
+    color: var(--primary);
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.vault-table tbody tr:hover {
+    background: rgba(21, 76, 155, 0.02);
+}
+
+.file-link,
+.region-link {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.file-link:hover,
+.region-link:hover {
+    text-decoration: underline;
+}
+
+.meta-badge {
+    display: inline-block;
+    background: var(--primary-soft);
+    color: var(--primary);
+    border-radius: 999px;
+    padding: 6px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.vault-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px 20px;
+    flex-wrap: wrap;
+}
+
+.pagination-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.pagination-actions a,
+.pagination-actions span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--line);
+    text-decoration: none;
+    color: var(--ink);
+    background: white;
+}
+
+.pagination-actions .current {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    font-weight: 700;
 }
 
 @media (max-width: 900px) {

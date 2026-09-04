@@ -780,6 +780,70 @@ function sanitize_region_key($value)
     return in_array($value, $regions, true) ? $value : 'panhandle';
 }
 
+function infer_file_type_label($fileName)
+{
+    $extension = strtolower(pathinfo((string) $fileName, PATHINFO_EXTENSION));
+    $map = [
+        'pdf' => 'PDF',
+        'doc' => 'Word',
+        'docx' => 'Word',
+        'xls' => 'Spreadsheet',
+        'xlsx' => 'Spreadsheet',
+        'csv' => 'Spreadsheet',
+        'ppt' => 'Presentation',
+        'pptx' => 'Presentation',
+        'png' => 'Image',
+        'jpg' => 'Image',
+        'jpeg' => 'Image',
+        'gif' => 'Image',
+        'webp' => 'Image',
+        'svg' => 'Image',
+        'txt' => 'Text',
+        'zip' => 'Archive',
+        'gz' => 'Archive',
+        'tar' => 'Archive',
+        '7z' => 'Archive',
+        'json' => 'Code',
+        'php' => 'Code',
+        'js' => 'Code',
+        'css' => 'Code',
+        'html' => 'Code',
+        'md' => 'Code',
+    ];
+
+    return $map[$extension] ?? ($extension !== '' ? strtoupper($extension) : 'Unknown');
+}
+
+function all_region_files_for_vault()
+{
+    $payload = get_region_files();
+    $entries = [];
+
+    foreach ($payload as $region => $files) {
+        foreach ($files as $file) {
+            $uploadedAt = (string) ($file['uploaded_at'] ?? gmdate('c'));
+            $path = normalize_storage_relative_path((string) ($file['path'] ?? ''));
+            $regionKey = sanitize_region_key((string) $region);
+
+            $entries[] = [
+                'id' => (string) ($file['id'] ?? uniqid('vault-', true)),
+                'name' => (string) ($file['name'] ?? 'untitled'),
+                'size' => (int) ($file['size'] ?? 0),
+                'uploaded_by' => (string) ($file['uploaded_by'] ?? 'Unknown'),
+                'uploaded_at' => $uploadedAt,
+                'region' => $regionKey,
+                'region_label' => region_label($regionKey),
+                'path' => $path,
+                'type' => infer_file_type_label((string) ($file['name'] ?? 'untitled')) . ' (inferred)',
+            ];
+        }
+    }
+
+    usort($entries, static fn($a, $b) => strtotime((string) $b['uploaded_at']) <=> strtotime((string) $a['uploaded_at']));
+
+    return $entries;
+}
+
 function normalize_mysql_datetime($value)
 {
     $timestamp = strtotime((string) $value);

@@ -60,7 +60,9 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
     <main>
         <header class="topbar">
             <div class="brand">
-                <div class="brand-mark">TX</div>
+                <a href="vault.php" class="brand-link" aria-label="Open Texas vault overview">
+                    <div class="brand-mark">TX</div>
+                </a>
                 <span>Texas Regional Vault</span>
             </div>
 
