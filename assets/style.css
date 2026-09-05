@@ -739,7 +739,8 @@ button.google {
 }
 
 .profile-card,
-.profile-files {
+.profile-files,
+.profile-history {
     background: #f9fbff;
     border: 1px solid var(--line);
     border-radius: 16px;
@@ -747,7 +748,8 @@ button.google {
 }
 
 .profile-card h2,
-.profile-files h2 {
+.profile-files h2,
+.profile-history h2 {
     margin-top: 0;
     margin-bottom: 14px;
 }
@@ -776,6 +778,29 @@ button.google {
     padding: 0;
     display: grid;
     gap: 10px;
+}
+
+.profile-history {
+    margin-top: 20px;
+}
+
+.profile-history ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.profile-history li {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 12px;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 12px;
 }
 
 .profile-files li {

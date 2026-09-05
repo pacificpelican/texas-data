@@ -332,8 +332,24 @@ function ensure_mysql_schema($connection)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     ";
 
+    $assistantHistorySql = "
+        CREATE TABLE IF NOT EXISTS assistant_history (
+            id VARCHAR(255) PRIMARY KEY,
+            user_id VARCHAR(255) NOT NULL,
+            user_name VARCHAR(255) NOT NULL,
+            user_email VARCHAR(255) NOT NULL,
+            region VARCHAR(50) NOT NULL DEFAULT '',
+            task VARCHAR(50) NOT NULL,
+            question MEDIUMTEXT NOT NULL,
+            prompt MEDIUMTEXT NOT NULL,
+            response MEDIUMTEXT NOT NULL,
+            created_at DATETIME NOT NULL
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ";
+
     mysqli_query($connection, $userSql);
     mysqli_query($connection, $regionSql);
+    mysqli_query($connection, $assistantHistorySql);
 
     if (!mysql_column_exists($connection, 'users', 'created_at')) {
         mysqli_query($connection, 'ALTER TABLE users ADD COLUMN created_at DATETIME DEFAULT NULL;');
@@ -403,6 +419,100 @@ function write_json_file($filePath, $data)
     return $written !== false;
 }
 
+function assistant_history_file_path()
+{
+    return app_path('data/assistant-history.json');
+}
+
+function create_assistant_history($user, $region, $task, $question, $prompt, $response)
+{
+    $entry = [
+        'id' => 'assistant-' . uniqid('', true),
+        'user_id' => (string) ($user['id'] ?? ''),
+        'user_name' => (string) ($user['name'] ?? 'Unknown'),
+        'user_email' => strtolower((string) ($user['email'] ?? '')),
+        'region' => $region === '' ? '' : sanitize_region_key($region),
+        'task' => (string) $task,
+        'question' => trim((string) $question),
+        'prompt' => (string) $prompt,
+        'response' => (string) $response,
+        'created_at' => gmdate('c'),
+    ];
+
+    $connection = get_mysql_connection();
+    if ($connection) {
+        $values = [];
+        foreach ($entry as $value) {
+            $values[] = "'" . mysqli_real_escape_string($connection, (string) $value) . "'";
+        }
+        $sql = 'INSERT INTO assistant_history (id, user_id, user_name, user_email, region, task, question, prompt, response, created_at) VALUES (' . implode(', ', $values) . ')';
+        $saved = mysqli_query($connection, $sql) !== false;
+        mysqli_close($connection);
+        return $saved ? $entry : null;
+    }
+
+    $history = read_json_file(assistant_history_file_path(), []);
+    $history[] = $entry;
+    return write_json_file(assistant_history_file_path(), $history) ? $entry : null;
+}
+
+function assistant_history_for_user($user)
+{
+    $userId = (string) ($user['id'] ?? '');
+    if ($userId === '') {
+        return [];
+    }
+
+    $connection = get_mysql_connection();
+    if ($connection) {
+        $safeUserId = mysqli_real_escape_string($connection, $userId);
+        $query = mysqli_query($connection, "SELECT id, user_id, user_name, user_email, region, task, question, prompt, response, created_at FROM assistant_history WHERE user_id = '$safeUserId' ORDER BY created_at DESC");
+        $history = $query ? mysqli_fetch_all($query, MYSQLI_ASSOC) : [];
+        if ($query) {
+            mysqli_free_result($query);
+        }
+        mysqli_close($connection);
+        return $history;
+    }
+
+    $history = read_json_file(assistant_history_file_path(), []);
+    $history = array_values(array_filter($history, static fn($entry) => (string) ($entry['user_id'] ?? '') === $userId));
+    usort($history, static fn($a, $b) => strtotime((string) ($b['created_at'] ?? '')) <=> strtotime((string) ($a['created_at'] ?? '')));
+    return $history;
+}
+
+function assistant_history_entry_for_user($id, $user)
+{
+    $id = trim((string) $id);
+    foreach (assistant_history_for_user($user) as $entry) {
+        if (hash_equals((string) ($entry['id'] ?? ''), $id)) {
+            return $entry;
+        }
+    }
+
+    return null;
+}
+
+function delete_assistant_history_for_user($user)
+{
+    $userId = (string) ($user['id'] ?? '');
+    if ($userId === '') {
+        return true;
+    }
+
+    $connection = get_mysql_connection();
+    if ($connection) {
+        $safeUserId = mysqli_real_escape_string($connection, $userId);
+        $deleted = mysqli_query($connection, "DELETE FROM assistant_history WHERE user_id = '$safeUserId'") !== false;
+        mysqli_close($connection);
+        return $deleted;
+    }
+
+    $history = read_json_file(assistant_history_file_path(), []);
+    $remaining = array_values(array_filter($history, static fn($entry) => (string) ($entry['user_id'] ?? '') !== $userId));
+    return write_json_file(assistant_history_file_path(), $remaining);
+}
+
 function current_user()
 {
     return $_SESSION['user'] ?? null;
@@ -427,6 +537,16 @@ function human_filesize($bytes)
     }
 
     return number_format($size, 1) . ' ' . $units[$unitIndex];
+}
+
+function shorten_text($value, $limit = 96)
+{
+    $value = trim((string) $value);
+    if (strlen($value) <= $limit) {
+        return $value;
+    }
+
+    return rtrim(substr($value, 0, max(0, $limit - 3))) . '...';
 }
 
 function region_options()
@@ -967,6 +1087,7 @@ function delete_user_uploads_and_account($user)
     }
 
     save_users($filteredUsers);
+    delete_assistant_history_for_user($user);
 
     unset($_SESSION['user']);
     return true;

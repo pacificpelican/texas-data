@@ -46,6 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = ask_local_llm($prompt);
         if ($result['ok']) {
             $assistantReply = (string) $result['answer'];
+            create_assistant_history($user, $selectedRegion, $task, $question, $prompt, $assistantReply);
         } else {
             $assistantError = (string) $result['message'];
         }

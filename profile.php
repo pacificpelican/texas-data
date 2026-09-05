@@ -6,6 +6,7 @@ $user = current_user();
 $storageStatus = get_storage_mode_status();
 $uploadsStatus = get_uploads_dir_status();
 $uploadedFiles = user_uploaded_files($user);
+$assistantHistory = assistant_history_for_user($user);
 $signupTimestamp = (string) ($user['created_at'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
@@ -120,6 +121,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
                     <?php endif; ?>
                 </div>
             </div>
+
+            <section class="profile-history">
+                <h2>AI assistant history</h2>
+                <?php if ($assistantHistory === []): ?>
+                    <div class="empty-state">You have not saved any AI assistant requests yet.</div>
+                <?php else: ?>
+                    <ul>
+                        <?php foreach ($assistantHistory as $entry): ?>
+                            <?php $summary = trim((string) ($entry['question'] ?? '')) ?: ucfirst((string) ($entry['task'] ?? 'assistant request')); ?>
+                            <li>
+                                <div class="profile-file-main">
+                                    <strong><a href="assistant-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text($summary), ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                    <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
+                                </div>
+                                <span class="file-tag"><?= htmlspecialchars(ucfirst((string) ($entry['task'] ?? 'summary')), ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
 
             <div class="delete-account">
                 <h3>Clear uploaded data only</h3>
