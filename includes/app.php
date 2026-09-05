@@ -340,6 +340,7 @@ function ensure_mysql_schema($connection)
             user_email VARCHAR(255) NOT NULL,
             region VARCHAR(50) NOT NULL DEFAULT '',
             task VARCHAR(50) NOT NULL,
+            model VARCHAR(255) NOT NULL DEFAULT '',
             question MEDIUMTEXT NOT NULL,
             prompt MEDIUMTEXT NOT NULL,
             response MEDIUMTEXT NOT NULL,
@@ -361,6 +362,10 @@ function ensure_mysql_schema($connection)
 
     if (!mysql_column_exists($connection, 'region_files', 'uploaded_by_email')) {
         mysqli_query($connection, 'ALTER TABLE region_files ADD COLUMN uploaded_by_email VARCHAR(255) DEFAULT NULL;');
+    }
+
+    if (!mysql_column_exists($connection, 'assistant_history', 'model')) {
+        mysqli_query($connection, "ALTER TABLE assistant_history ADD COLUMN model VARCHAR(255) NOT NULL DEFAULT '';");
     }
 }
 
@@ -424,8 +429,9 @@ function assistant_history_file_path()
     return app_path('data/assistant-history.json');
 }
 
-function create_assistant_history($user, $region, $task, $question, $prompt, $response)
+function create_assistant_history($user, $region, $task, $question, $prompt, $response, $model = null)
 {
+    $model = $model ?? (string) (get_llm_config()['model'] ?? 'Unknown model');
     $entry = [
         'id' => 'assistant-' . uniqid('', true),
         'user_id' => (string) ($user['id'] ?? ''),
@@ -433,6 +439,7 @@ function create_assistant_history($user, $region, $task, $question, $prompt, $re
         'user_email' => strtolower((string) ($user['email'] ?? '')),
         'region' => $region === '' ? '' : sanitize_region_key($region),
         'task' => (string) $task,
+        'model' => (string) $model,
         'question' => trim((string) $question),
         'prompt' => (string) $prompt,
         'response' => (string) $response,
@@ -445,7 +452,7 @@ function create_assistant_history($user, $region, $task, $question, $prompt, $re
         foreach ($entry as $value) {
             $values[] = "'" . mysqli_real_escape_string($connection, (string) $value) . "'";
         }
-        $sql = 'INSERT INTO assistant_history (id, user_id, user_name, user_email, region, task, question, prompt, response, created_at) VALUES (' . implode(', ', $values) . ')';
+        $sql = 'INSERT INTO assistant_history (id, user_id, user_name, user_email, region, task, model, question, prompt, response, created_at) VALUES (' . implode(', ', $values) . ')';
         $saved = mysqli_query($connection, $sql) !== false;
         mysqli_close($connection);
         return $saved ? $entry : null;
@@ -466,7 +473,7 @@ function assistant_history_for_user($user)
     $connection = get_mysql_connection();
     if ($connection) {
         $safeUserId = mysqli_real_escape_string($connection, $userId);
-        $query = mysqli_query($connection, "SELECT id, user_id, user_name, user_email, region, task, question, prompt, response, created_at FROM assistant_history WHERE user_id = '$safeUserId' ORDER BY created_at DESC");
+        $query = mysqli_query($connection, "SELECT id, user_id, user_name, user_email, region, task, model, question, prompt, response, created_at FROM assistant_history WHERE user_id = '$safeUserId' ORDER BY created_at DESC");
         $history = $query ? mysqli_fetch_all($query, MYSQLI_ASSOC) : [];
         if ($query) {
             mysqli_free_result($query);

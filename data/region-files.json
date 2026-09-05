@@ -1,16 +1,5 @@
 {
-    "panhandle": [
-        {
-            "id": "upload-6a9a5e00e20667.24628658",
-            "name": "A_North_Cascades_Mystery.txt",
-            "size": 21784,
-            "uploaded_by": "Mack Johnson",
-            "uploaded_by_id": "user-6a99be109d2b1",
-            "uploaded_by_email": "2020@sf3am.com",
-            "uploaded_at": "2026-09-04 05:58:24",
-            "path": "storage/uploads/panhandle/file-6a9a5e00e1e468.88002034-A_North_Cascades_Mystery.txt"
-        }
-    ],
+    "panhandle": [],
     "north": [],
     "central": [],
     "gulf": [],

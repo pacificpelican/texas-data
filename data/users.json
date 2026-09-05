@@ -4,38 +4,36 @@
         "name": "Demo User",
         "email": "demo@texasdrive.app",
         "password": "$2y$12$1R2BoW/mNClJPHRdJHJOfe3VkMTLAhqJb1nUyu6IkkYSHiHMSjxty",
-        "provider": "email"
+        "provider": "email",
+        "created_at": "2026-09-05T02:15:18+00:00"
     },
     {
         "id": "google-6a99bc5a1c2bc",
         "name": "newuser",
         "email": "newuser@gmail.com",
-        "provider": "google"
+        "provider": "google",
+        "created_at": "2026-09-05T02:15:18+00:00"
     },
     {
         "id": "google-6a99bc9a9dbae",
         "name": "pacificpelican",
         "email": "pacificpelican@gmail.com",
-        "provider": "google"
+        "provider": "google",
+        "created_at": "2026-09-05T02:15:18+00:00"
     },
     {
         "id": "google-6a99bd5f5cbfa",
         "name": "black",
         "email": "black@google.com",
-        "provider": "google"
+        "provider": "google",
+        "created_at": "2026-09-05T02:15:18+00:00"
     },
     {
         "id": "user-6a99bdd0172b2",
         "name": "Alice Smith",
         "email": "alice@example.com",
         "password": "$2y$12$hSskIO5wu9hwhxAGdfM5S.mey1hFtRf9XQdhbfDj.T33SCRTTBihW",
-        "provider": "email"
-    },
-    {
-        "id": "user-6a99be109d2b1",
-        "name": "Mack Johnson",
-        "email": "2020@sf3am.com",
-        "password": "$2y$12$95ySkyi41I3sNhQvAbq36.IaJ8amJyg.BZyoTk88CA9zzcb6uVjOq",
-        "provider": "email"
+        "provider": "email",
+        "created_at": "2026-09-05T02:15:18+00:00"
     }
 ]

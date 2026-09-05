@@ -129,10 +129,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
                 <?php else: ?>
                     <ul>
                         <?php foreach ($assistantHistory as $entry): ?>
-                            <?php $summary = trim((string) ($entry['question'] ?? '')) ?: ucfirst((string) ($entry['task'] ?? 'assistant request')); ?>
+                            <?php
+                            $prompt = (string) ($entry['prompt'] ?? '');
+                            $documentStart = strpos($prompt, '--- Document 1 ---');
+                            $documentText = $documentStart === false ? '' : substr($prompt, $documentStart + strlen('--- Document 1 ---'));
+                            $words = trim($documentText) === '' ? [] : preg_split('/\s+/', trim($documentText));
+                            $summary = $words === [] ? 'Document prompt unavailable' : implode(' ', array_slice($words, 0, 5));
+                            ?>
                             <li>
                                 <div class="profile-file-main">
-                                    <strong><a href="assistant-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text($summary), ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                    <strong><a href="assistant-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars($summary, ENT_QUOTES, 'UTF-8') ?></a></strong>
                                     <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
                                 </div>
                                 <span class="file-tag"><?= htmlspecialchars(ucfirst((string) ($entry['task'] ?? 'summary')), ENT_QUOTES, 'UTF-8') ?></span>

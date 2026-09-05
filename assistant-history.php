@@ -41,15 +41,16 @@ if ($entry === null) {
                     <div class="profile-row"><span>Written by</span><strong><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?></strong></div>
                     <div class="profile-row"><span>Created</span><strong><?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></strong></div>
                     <div class="profile-row"><span>Region</span><strong><?= htmlspecialchars(($entry['region'] ?? '') === '' ? 'All regions' : region_label((string) $entry['region']), ENT_QUOTES, 'UTF-8') ?></strong></div>
+                    <div class="profile-row"><span>LLM</span><strong><?= htmlspecialchars((string) (($entry['model'] ?? '') !== '' ? $entry['model'] : (get_llm_config()['model'] ?? 'Unknown model')), ENT_QUOTES, 'UTF-8') ?></strong></div>
                 </div>
             </div>
             <div class="profile-history">
-                <h2>Request</h2>
-                <div class="ai-response"><?= htmlspecialchars((string) (($entry['question'] ?? '') !== '' ? $entry['question'] : 'No follow-up question was provided.'), ENT_QUOTES, 'UTF-8') ?></div>
                 <h2>Full prompt</h2>
                 <div class="ai-response"><?= htmlspecialchars((string) ($entry['prompt'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
                 <h2>Response</h2>
                 <div class="ai-response"><?= htmlspecialchars((string) ($entry['response'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
+                <h2>Request</h2>
+                <div class="ai-response"><?= htmlspecialchars((string) (($entry['question'] ?? '') !== '' ? $entry['question'] : 'No follow-up question was provided.'), ENT_QUOTES, 'UTF-8') ?></div>
             </div>
         </section>
     </main>
