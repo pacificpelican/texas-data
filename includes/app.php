@@ -782,61 +782,14 @@ function create_email_account($name, $email, $password)
     ];
 }
 
-function default_region_payload()
+function empty_region_payload()
 {
     return [
-        'panhandle' => [
-            [
-                'id' => 'pan-01',
-                'name' => 'roadmap.pdf',
-                'size' => 1024 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-01T11:00:00Z',
-            ],
-            [
-                'id' => 'pan-02',
-                'name' => 'community-site-plan.docx',
-                'size' => 560 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-01T12:30:00Z',
-            ],
-        ],
-        'north' => [
-            [
-                'id' => 'north-01',
-                'name' => 'construction-timeline.xlsx',
-                'size' => 814 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-02T09:45:00Z',
-            ],
-        ],
-        'central' => [
-            [
-                'id' => 'central-01',
-                'name' => 'regional-budget.csv',
-                'size' => 320 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-03T08:15:00Z',
-            ],
-        ],
-        'gulf' => [
-            [
-                'id' => 'gulf-01',
-                'name' => 'coastal-incident-report.pdf',
-                'size' => 2 * 1024 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-03T14:00:00Z',
-            ],
-        ],
-        'south' => [
-            [
-                'id' => 'south-01',
-                'name' => 'border-logistics.xlsx',
-                'size' => 671 * 1024,
-                'uploaded_by' => 'Demo User',
-                'uploaded_at' => '2026-09-02T16:30:00Z',
-            ],
-        ],
+        'panhandle' => [],
+        'north' => [],
+        'central' => [],
+        'gulf' => [],
+        'south' => [],
     ];
 }
 
@@ -847,7 +800,7 @@ function ensure_region_files()
         return;
     }
 
-    write_json_file($file, default_region_payload());
+    write_json_file($file, empty_region_payload());
 }
 
 function get_region_files()
@@ -885,23 +838,11 @@ function get_region_files()
 
         mysqli_close($connection);
 
-        if (array_sum(array_map('count', $payload)) === 0) {
-            $seedPayload = default_region_payload();
-            save_region_files($seedPayload);
-            return $seedPayload;
-        }
-
         return $payload;
     }
 
     ensure_region_files();
-    $default = [
-        'panhandle' => [],
-        'north' => [],
-        'central' => [],
-        'gulf' => [],
-        'south' => [],
-    ];
+    $default = empty_region_payload();
 
     $payload = read_json_file(app_path('data/region-files.json'), $default);
     foreach ($default as $key => $value) {
