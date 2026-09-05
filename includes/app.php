@@ -560,10 +560,10 @@ function region_options()
 {
     return [
         'panhandle' => 'Panhandle',
-        'north' => 'North Texas',
+        'north' => 'East',
         'central' => 'Central Texas',
         'gulf' => 'Gulf Coast',
-        'south' => 'South Texas',
+        'south' => 'West',
     ];
 }
 

@@ -102,27 +102,27 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
 
                 <svg class="map-svg" viewBox="0 0 500 620" role="img" aria-label="Texas map divided into five regions">
                     <a class="map-region region-1 <?= $selectedRegion === 'panhandle' ? 'active' : '' ?>" href="dashboard.php?region=panhandle">
-                        <polygon points="118,40 332,32 390,70 418,126 404,188 332,226 246,216 166,204 108,168 92,104" />
+                        <polygon points="130,40 330,40 330,240 130,240" />
                     </a>
                     <a class="map-region region-2 <?= $selectedRegion === 'north' ? 'active' : '' ?>" href="dashboard.php?region=north">
-                        <polygon points="170,178 282,166 344,210 396,290 382,360 330,410 268,432 196,402 130,346 116,272" />
+                        <polygon points="350,95 490,95 490,185 350,185" />
                     </a>
                     <a class="map-region region-3 <?= $selectedRegion === 'central' ? 'active' : '' ?>" href="dashboard.php?region=central">
-                        <polygon points="160,338 250,328 332,392 358,474 344,560 242,610 178,594 118,528 100,448 114,382" />
+                        <polygon points="120,260 220,260 220,340 120,340" />
                     </a>
                     <a class="map-region region-4 <?= $selectedRegion === 'gulf' ? 'active' : '' ?>" href="dashboard.php?region=gulf">
-                        <polygon points="64,438 122,378 192,366 240,392 220,610 146,610 90,580 52,514" />
+                        <polygon points="432,442 352,465 285,441 257,394 383,215 447,252 481,307 480,382" />
                     </a>
                     <a class="map-region region-5 <?= $selectedRegion === 'south' ? 'active' : '' ?>" href="dashboard.php?region=south">
-                        <polygon points="82,242 150,182 220,198 214,298 162,426 78,396 30,320 34,276" />
+                        <polygon points="20,250 100,250 100,330" />
                     </a>
 
                     <g font-size="16" font-weight="700" fill="#163d68">
                         <text x="170" y="120">Panhandle</text>
-                        <text x="155" y="270">North</text>
-                        <text x="155" y="490">Central</text>
-                        <text x="95" y="535">Gulf</text>
-                        <text x="58" y="295">South</text>
+                        <text x="400" y="145">East</text>
+                        <text x="136" y="305">Central</text>
+                        <text x="390" y="350">Gulf</text>
+                        <text x="38" y="278">West</text>
                     </g>
                 </svg>
             </div>
