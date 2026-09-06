@@ -11,6 +11,7 @@ Texas Regional Vault is a lightweight PHP app for organizing regional project fi
 - Optional Google sign-in when configured in the app config
 - Profile page with account details, upload history, and data-management controls
 - Local AI assistant that summarizes or analyzes files from a selected region or the full vault
+- General LLM chat page for free-form prompts, with a separate per-user chat history on the profile
 - Flexible storage mode:
   - default JSON file storage for simple local use
   - MySQL/MariaDB when enabled and configured with the correct database credentials
@@ -36,6 +37,10 @@ The app prefers a JSON file store unless a valid MySQL connection is configured 
 ## AI assistant
 
 The AI Assistant page can review the current vault documents and answer questions based on the selected region or the complete vault. It uses Ollama at localhost:11434 when enabled in the config.
+
+## LLM chat
+
+The LLM Chat page lets any signed-in user send free-form prompts to the same local Ollama model. Each prompt/response pair is saved per user (MySQL `llm_history` table, or data/llm-history.json in file-storage mode) and shown on the profile page in a separate "LLM chat history" section.
 
 ## Notes
 

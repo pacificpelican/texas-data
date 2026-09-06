@@ -77,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <a href="profile.php">Profile</a>
                     <a href="dashboard.php?region=<?= rawurlencode($selectedRegion) ?>">Back to map</a>
                     <a href="vault.php?region=<?= rawurlencode($selectedRegion) ?>">Vault</a>
+                    <a href="llm.php">LLM Chat</a>
                     <a href="logout.php">Log out</a>
                 </div>
 

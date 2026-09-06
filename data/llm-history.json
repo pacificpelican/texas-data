@@ -1,0 +1,12 @@
+[
+    {
+        "id": "llm-6a9cc8c6d89d88.09604366",
+        "user_id": "demo-user",
+        "user_name": "Demo User",
+        "user_email": "demo@texasdrive.app",
+        "model": "llama3.1:8b",
+        "prompt": "Where is the best cotton candy made?",
+        "response": "The question of where the best cotton candy is made is subjective, as it often comes down to personal taste preferences and regional specialties. However, I can give you some popular destinations and vendors known for their exceptional cotton candy:\n\n1. **The Original Cottontail Cottage** (Wisconsin, USA): This family-owned business has been a cotton candy institution since 1968. Their fluffy, sugary treats are made with a secret recipe and are a must-try at the Wisconsin State Fair.\n2. **Cotton Candy Heaven** (Florida, USA): Located in Orlando, this popular food truck has been serving up gourmet cotton candy flavors like strawberry shortcake and salted caramel since 2012.\n3. **The Cotton Candy Stand** (San Diego, California, USA): This beachside vendor has been a local favorite for over 20 years, offering a wide range of flavors, including classic blue raspberry and unique options like matcha green tea.\n4. **Cotton Candy World** (Tokyo, Japan): This colorful and lively shop in the heart of Tokyo offers an impressive variety of cotton candy flavors, including matcha, strawberry, and even savory options like wasabi and miso.\n5. **Candytopia** (Multiple locations, USA): This interactive candy museum features a cotton candy bar where visitors can create their own custom flavors and designs.\n\nSome notable mentions include:\n\n* **The Cotton Candy Festival** (Louisiana, USA): This annual festival celebrates all things cotton candy, with live music, games, and, of course, plenty of fluffy treats.\n* **Cotton Candy Lane** (Universal Studios Hollywood, California, USA): This themed food stand offers a variety of cotton candy flavors and designs inspired by popular movies and TV shows.\n\nRemember, the best cotton candy is often a matter of personal taste, so feel free to explore and find your favorite spot!",
+        "created_at": "2026-09-06T01:58:30+00:00"
+    }
+]

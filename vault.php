@@ -42,6 +42,7 @@ $uploadsStatus = get_uploads_dir_status();
                     <a href="profile.php">Profile</a>
                     <a href="dashboard.php?region=<?= rawurlencode($currentRegion) ?>">Back to map</a>
                     <a href="assistant.php?region=<?= rawurlencode($currentRegion) ?>">AI Assistant</a>
+                    <a href="llm.php">LLM Chat</a>
                     <a href="logout.php">Log out</a>
                 </div>
 

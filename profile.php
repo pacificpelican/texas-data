@@ -7,6 +7,7 @@ $storageStatus = get_storage_mode_status();
 $uploadsStatus = get_uploads_dir_status();
 $uploadedFiles = user_uploaded_files($user);
 $assistantHistory = assistant_history_for_user($user);
+$llmHistory = llm_history_for_user($user);
 $signupTimestamp = (string) ($user['created_at'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
@@ -43,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
                     <a href="dashboard.php">Back to map</a>
                     <a href="vault.php">Vault</a>
                     <a href="assistant.php">AI Assistant</a>
+                    <a href="llm.php">LLM Chat</a>
                     <a href="logout.php">Log out</a>
                 </div>
 
@@ -142,6 +144,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
                                     <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
                                 </div>
                                 <span class="file-tag"><?= htmlspecialchars(ucfirst((string) ($entry['task'] ?? 'summary')), ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
+
+            <section class="profile-history">
+                <h2>LLM chat history</h2>
+                <?php if ($llmHistory === []): ?>
+                    <div class="empty-state">You have not saved any LLM chats yet. Visit the LLM Chat page to ask the model anything.</div>
+                <?php else: ?>
+                    <ul>
+                        <?php foreach ($llmHistory as $entry): ?>
+                            <li>
+                                <div class="profile-file-main">
+                                    <strong><a href="llm-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text((string) ($entry['prompt'] ?? ''), 72), ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                    <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
+                                </div>
+                                <span class="file-tag"><?= htmlspecialchars((string) (($entry['model'] ?? '') !== '' ? $entry['model'] : 'LLM'), ENT_QUOTES, 'UTF-8') ?></span>
                             </li>
                         <?php endforeach; ?>
                     </ul>
