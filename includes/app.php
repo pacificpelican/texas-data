@@ -795,6 +795,7 @@ function sign_in_with_email($email, $password)
             'name' => $user['name'],
             'email' => $user['email'],
             'provider' => $user['provider'] ?? 'email',
+            'created_at' => $user['created_at'] ?? null,
         ];
     }
 
@@ -813,6 +814,7 @@ function ensure_google_user($email, $name = null)
                 'name' => $user['name'],
                 'email' => $user['email'],
                 'provider' => $user['provider'] ?? 'google',
+                'created_at' => $user['created_at'] ?? null,
             ];
         }
     }
@@ -838,6 +840,7 @@ function ensure_google_user($email, $name = null)
         'name' => $newUser['name'],
         'email' => $newUser['email'],
         'provider' => $newUser['provider'],
+        'created_at' => $newUser['created_at'],
     ];
 }
 
@@ -885,6 +888,7 @@ function create_email_account($name, $email, $password)
             'name' => $newUser['name'],
             'email' => $newUser['email'],
             'provider' => $newUser['provider'],
+            'created_at' => $newUser['created_at'],
         ],
     ];
 }
@@ -1149,45 +1153,42 @@ function delete_user_uploads_and_account($user)
     return true;
 }
 
-function clear_all_uploaded_data()
+function clear_user_uploaded_data($user)
 {
+    $userId = strtolower((string) ($user['id'] ?? ''));
+    $userEmail = strtolower((string) ($user['email'] ?? ''));
+    $userName = trim((string) ($user['name'] ?? ''));
+
     $payload = get_region_files();
-    $emptyPayload = [
-        'panhandle' => [],
-        'north' => [],
-        'central' => [],
-        'gulf' => [],
-        'south' => [],
-    ];
+    $updatedPayload = [];
 
     foreach ($payload as $region => $regionFiles) {
+        $filteredFiles = [];
         foreach ($regionFiles as $file) {
-            $relativePath = normalize_storage_relative_path((string) ($file['path'] ?? ''));
-            $absolutePath = $relativePath !== '' ? app_path($relativePath) : '';
-            if ($absolutePath !== '' && is_file($absolutePath)) {
-                @unlink($absolutePath);
+            $uploadedById = strtolower((string) ($file['uploaded_by_id'] ?? ''));
+            $uploadedByEmail = strtolower((string) ($file['uploaded_by_email'] ?? ''));
+            $uploadedByName = trim((string) ($file['uploaded_by'] ?? ''));
+
+            $matchesUser = ($userId !== '' && $uploadedById === $userId)
+                || ($userEmail !== '' && $uploadedByEmail === $userEmail)
+                || ($userName !== '' && $uploadedByName === $userName);
+
+            if ($matchesUser) {
+                $relativePath = normalize_storage_relative_path((string) ($file['path'] ?? ''));
+                $absolutePath = $relativePath !== '' ? app_path($relativePath) : '';
+                if ($absolutePath !== '' && is_file($absolutePath)) {
+                    @unlink($absolutePath);
+                }
+                continue;
             }
+
+            $filteredFiles[] = $file;
         }
+
+        $updatedPayload[$region] = $filteredFiles;
     }
 
-    $uploadsRoot = app_path('storage/uploads');
-    if (is_dir($uploadsRoot)) {
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($uploadsRoot, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($files as $fileInfo) {
-            $path = $fileInfo->getPathname();
-            if ($fileInfo->isDir()) {
-                @rmdir($path);
-            } else {
-                @unlink($path);
-            }
-        }
-    }
-
-    save_region_files($emptyPayload);
+    save_region_files($updatedPayload);
     return true;
 }
 

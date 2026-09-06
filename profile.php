@@ -16,7 +16,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data'])) {
-    clear_all_uploaded_data();
+    clear_user_uploaded_data($user);
+    redirect('profile.php');
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content'])) {
+    delete_assistant_history_for_user($user);
+    delete_llm_history_for_user($user);
     redirect('profile.php');
 }
 ?>
@@ -170,9 +176,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
             </section>
 
             <div class="delete-account">
-                <h3>Clear uploaded data only</h3>
-                <form method="post" onsubmit="return confirm('This removes all uploaded files and their metadata, but keeps every user account. Continue?');">
-                    <button type="submit" name="clear_uploaded_data" value="1">Clear all uploaded data</button>
+                <h3>Clear your uploaded files</h3>
+                <form method="post" onsubmit="return confirm('This removes every file you have uploaded, but keeps your account and chats. Continue?');">
+                    <button type="submit" name="clear_uploaded_data" value="1">Clear my uploaded files</button>
+                </form>
+            </div>
+
+            <div class="delete-account" style="margin-top: 12px; border-color: rgba(189, 61, 61, 0.3);">
+                <h3>Clear your created content</h3>
+                <form method="post" onsubmit="return confirm('This permanently deletes all your AI assistant chats and LLM chats. Continue?');">
+                    <button type="submit" name="clear_created_content" value="1">Clear my AI and LLM chats</button>
                 </form>
             </div>
 
