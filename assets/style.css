@@ -732,6 +732,45 @@ button.google {
     font-size: clamp(2rem, 3vw, 2.6rem);
 }
 
+.profile-header-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.print-button {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 1rem;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.print-button:hover {
+    border-color: var(--primary);
+}
+
+@media print {
+    .topbar,
+    .print-button,
+    .debug-shell,
+    .hard-refresh {
+        display: none !important;
+    }
+
+    body {
+        background: #fff !important;
+    }
+
+    .profile-panel {
+        border: none !important;
+        box-shadow: none !important;
+        background: #fff !important;
+    }
+}
+
 .profile-grid {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;

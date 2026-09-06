@@ -9,13 +9,15 @@ if ($entry === null) {
     exit('LLM history entry not found.');
 }
 $modelLabel = (string) (($entry['model'] ?? '') !== '' ? $entry['model'] : (get_llm_config()['model'] ?? 'Unknown model'));
+$createdTimestamp = strtotime((string) ($entry['created_at'] ?? 'now'));
+$documentTitle = 'LLM_Chat_History_' . gmdate('Ymd_His', $createdTimestamp === false ? time() : $createdTimestamp);
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LLM Chat History</title>
+    <title><?= htmlspecialchars($documentTitle, ENT_QUOTES, 'UTF-8') ?></title>
     <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
@@ -36,7 +38,10 @@ $modelLabel = (string) (($entry['model'] ?? '') !== '' ? $entry['model'] : (get_
         <section class="profile-panel">
             <div class="profile-header">
                 <h1>LLM chat</h1>
-                <span class="meta-badge"><?= htmlspecialchars($modelLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                <div class="profile-header-actions">
+                    <button type="button" class="print-button" onclick="window.print();" title="Print or save as PDF" aria-label="Print or save as PDF">🖨️</button>
+                    <span class="meta-badge"><?= htmlspecialchars($modelLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
             </div>
             <div class="profile-card">
                 <div class="profile-meta">
