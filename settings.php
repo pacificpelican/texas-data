@@ -133,6 +133,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <button type="submit" class="primary">Save settings</button>
             </form>
+
+            <footer class="site-credit">Texas Data by Daniel McKeown <a href="https://altaredwood.work">https://altaredwood.work</a></footer>
         </section>
     </main>
 

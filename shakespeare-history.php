@@ -50,6 +50,9 @@ $documentTitle = 'Shakespeare_Prediction_' . gmdate('Ymd_His', $createdTimestamp
                     <div class="profile-row"><span>Written by</span><strong><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?></strong></div>
                     <div class="profile-row"><span>Created</span><strong><?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></strong></div>
                     <div class="profile-row"><span>LLM</span><strong><?= htmlspecialchars($modelLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                    <?php if (trim((string) ($entry['temperature'] ?? '')) !== ''): ?>
+                        <div class="profile-row"><span>Temperature</span><strong><?= htmlspecialchars((string) $entry['temperature'], ENT_QUOTES, 'UTF-8') ?></strong></div>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="profile-history">

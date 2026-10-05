@@ -814,6 +814,24 @@ button.google {
     color: inherit;
 }
 
+.site-credit {
+    margin-top: 28px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.site-credit a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.site-credit a:hover {
+    text-decoration: underline;
+}
+
 .profile-grid {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;

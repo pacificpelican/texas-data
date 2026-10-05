@@ -47,15 +47,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $multiplier = $targetMap[$lengthChoice][0];
         $targetWords = max(50, (int) round($targetWords * $multiplier));
 
+        $temperature = isset($_POST['temperature']) && $_POST['temperature'] !== '' && is_numeric($_POST['temperature'])
+            ? max(0.0, min(2.0, (float) $_POST['temperature']))
+            : null;
+
         $prompt = "You are the Shake-speare Prediction Machine. Continue the following passage of Shake-speare " .
             "in the same voice, style, and verse form, picking up exactly where it leaves off. " .
             "Do not summarize or comment on the text; write the continuation only. " .
             "Aim for roughly {$targetWords} words.\n\n---\n\n" . $excerpt;
 
-        $result = ask_local_llm($prompt);
+        $result = ask_local_llm($prompt, null, $temperature);
         if ($result['ok']) {
             $shxReply = (string) $result['answer'];
-            create_shakespeare_history($user, $excerpt, $prompt, $shxReply, $llmConfig['model']);
+            create_shakespeare_history($user, $excerpt, $prompt, $shxReply, $llmConfig['model'], $temperature);
             $recentRuns = array_slice(shakespeare_history_for_user($user), 0, 5);
         } else {
             $shxError = (string) $result['message'];
@@ -138,6 +142,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <option value="same" <?= $lengthChoice === 'same' ? 'selected' : '' ?>>About the same length as the passage</option>
                             <option value="onehalf" <?= $lengthChoice === 'onehalf' ? 'selected' : '' ?>>About 1.5× the passage</option>
                             <option value="double" <?= $lengthChoice === 'double' ? 'selected' : '' ?>>About 2× the passage</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        Temperature (optional)
+                        <select name="temperature">
+                            <option value="" selected>Default (<?= htmlspecialchars((string) $llmConfig['temperature'], ENT_QUOTES, 'UTF-8') ?>)</option>
+                            <option value="0.1">0.1 — very focused</option>
+                            <option value="0.4">0.4 — careful</option>
+                            <option value="0.9">0.9 — creative</option>
+                            <option value="1.3">1.3 — wild</option>
                         </select>
                     </label>
 

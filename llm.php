@@ -15,10 +15,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($prompt === '') {
         $llmError = 'Please enter a prompt for the LLM.';
     } else {
-        $result = ask_local_llm($prompt);
+        $temperature = isset($_POST['temperature']) && $_POST['temperature'] !== '' && is_numeric($_POST['temperature'])
+            ? max(0.0, min(2.0, (float) $_POST['temperature']))
+            : null;
+        $result = ask_local_llm($prompt, null, $temperature);
         if ($result['ok']) {
             $llmReply = (string) $result['answer'];
-            create_llm_history($user, $prompt, $llmReply, $llmConfig['model']);
+            create_llm_history($user, $prompt, $llmReply, $llmConfig['model'], $temperature);
             $recentChats = array_slice(llm_history_for_user($user), 0, 5);
         } else {
             $llmError = (string) $result['message'];
@@ -85,6 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <label>
                         Your prompt
                         <textarea name="prompt" placeholder="Ask the model anything — brainstorm, explain, draft, translate..."><?= htmlspecialchars($prompt, ENT_QUOTES, 'UTF-8') ?></textarea>
+                    </label>
+
+                    <label>
+                        Temperature (optional)
+                        <select name="temperature">
+                            <option value="" selected>Default (<?= htmlspecialchars((string) $llmConfig['temperature'], ENT_QUOTES, 'UTF-8') ?>)</option>
+                            <option value="0.1">0.1 — very focused</option>
+                            <option value="0.4">0.4 — careful</option>
+                            <option value="0.9">0.9 — creative</option>
+                            <option value="1.3">1.3 — wild</option>
+                        </select>
                     </label>
 
                     <button type="submit" class="primary">Send to LLM</button>

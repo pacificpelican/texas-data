@@ -381,6 +381,10 @@ function ensure_mysql_schema($connection)
     if (!mysql_column_exists($connection, 'assistant_history', 'model')) {
         mysqli_query($connection, "ALTER TABLE assistant_history ADD COLUMN model VARCHAR(255) NOT NULL DEFAULT '';");
     }
+
+    if (!mysql_column_exists($connection, 'llm_history', 'temperature')) {
+        mysqli_query($connection, 'ALTER TABLE llm_history ADD COLUMN temperature VARCHAR(20) DEFAULT NULL;');
+    }
 }
 
 function app_path($path = '')
@@ -615,7 +619,7 @@ function shakespeare_history_file_path()
     return app_path('data/shakespeare-history.json');
 }
 
-function create_shakespeare_history($user, $excerpt, $prompt, $response, $model = null)
+function create_shakespeare_history($user, $excerpt, $prompt, $response, $model = null, $temperature = null)
 {
     $model = $model ?? (string) (get_llm_config()['model'] ?? 'Unknown model');
     $entry = [
@@ -624,6 +628,7 @@ function create_shakespeare_history($user, $excerpt, $prompt, $response, $model 
         'user_name' => (string) ($user['name'] ?? 'Unknown'),
         'user_email' => strtolower((string) ($user['email'] ?? '')),
         'model' => (string) $model,
+        'temperature' => $temperature !== null ? (string) $temperature : (string) (get_llm_config()['temperature'] ?? ''),
         'excerpt' => (string) $excerpt,
         'prompt' => (string) $prompt,
         'response' => (string) $response,
@@ -677,7 +682,7 @@ function llm_history_file_path()
     return app_path('data/llm-history.json');
 }
 
-function create_llm_history($user, $prompt, $response, $model = null)
+function create_llm_history($user, $prompt, $response, $model = null, $temperature = null)
 {
     $model = $model ?? (string) (get_llm_config()['model'] ?? 'Unknown model');
     $entry = [
@@ -686,6 +691,7 @@ function create_llm_history($user, $prompt, $response, $model = null)
         'user_name' => (string) ($user['name'] ?? 'Unknown'),
         'user_email' => strtolower((string) ($user['email'] ?? '')),
         'model' => (string) $model,
+        'temperature' => $temperature !== null ? (string) $temperature : (string) (get_llm_config()['temperature'] ?? ''),
         'prompt' => (string) $prompt,
         'response' => (string) $response,
         'created_at' => gmdate('c'),
@@ -697,7 +703,7 @@ function create_llm_history($user, $prompt, $response, $model = null)
         foreach ($entry as $value) {
             $values[] = "'" . mysqli_real_escape_string($connection, (string) $value) . "'";
         }
-        $sql = 'INSERT INTO llm_history (id, user_id, user_name, user_email, model, prompt, response, created_at) VALUES (' . implode(', ', $values) . ')';
+        $sql = 'INSERT INTO llm_history (id, user_id, user_name, user_email, model, temperature, prompt, response, created_at) VALUES (' . implode(', ', $values) . ')';
         $saved = mysqli_query($connection, $sql) !== false;
         mysqli_close($connection);
         return $saved ? $entry : null;
@@ -718,7 +724,7 @@ function llm_history_for_user($user)
     $connection = get_mysql_connection();
     if ($connection) {
         $safeUserId = mysqli_real_escape_string($connection, $userId);
-        $query = mysqli_query($connection, "SELECT id, user_id, user_name, user_email, model, prompt, response, created_at FROM llm_history WHERE user_id = '$safeUserId' ORDER BY created_at DESC");
+        $query = mysqli_query($connection, "SELECT id, user_id, user_name, user_email, model, temperature, prompt, response, created_at FROM llm_history WHERE user_id = '$safeUserId' ORDER BY created_at DESC");
         $history = $query ? mysqli_fetch_all($query, MYSQLI_ASSOC) : [];
         if ($query) {
             mysqli_free_result($query);
@@ -1705,7 +1711,7 @@ function build_vault_assistant_prompt($task, $question, $documents)
         $taskLabel . "\n\nDocuments:\n" . $docText . $questionText;
 }
 
-function ask_local_llm($prompt, $model = null)
+function ask_local_llm($prompt, $model = null, $temperature = null)
 {
     $config = get_llm_config();
     if (!$config['enabled']) {
@@ -1717,7 +1723,7 @@ function ask_local_llm($prompt, $model = null)
         'prompt' => (string) $prompt,
         'stream' => false,
         'options' => [
-            'temperature' => (float) $config['temperature'],
+            'temperature' => $temperature !== null ? (float) $temperature : (float) $config['temperature'],
         ],
     ];
 

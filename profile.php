@@ -218,6 +218,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
                     <button type="submit" name="delete_account" value="1">Delete my account and uploads</button>
                 </form>
             </div>
+
+            <footer class="site-credit">Texas Data by Daniel McKeown <a href="https://altaredwood.work">https://altaredwood.work</a></footer>
         </section>
     </main>
 
