@@ -44,14 +44,17 @@ if (isset($_GET['error'])) {
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Texas Regional Vault</title>
+    <title>Texas Data</title>
     <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
     <main class="auth-shell">
         <section class="auth-grid">
             <div class="hero-panel">
-                <h1>Texas Regional Vault</h1>
+                <div class="brand" style="margin-bottom: 18px;">
+                    <div class="brand-mark hero-brand-mark"><svg viewBox="0 0 64 48" aria-hidden="true" focusable="false"><path d="M32 12 C25 12 20 10 15 7 C9 4 5 3 3 6 C1 9 5 13 11 15 C16 17 21 18 25 19 L25 23 C25 26 26 29 28 31 L26 44 L38 44 L36 31 C38 29 39 26 39 23 L39 19 C43 18 48 17 53 15 C59 13 63 9 61 6 C59 3 55 4 49 7 C44 10 39 12 32 12 Z"/></svg></div>
+                </div>
+                <h1>Texas Data</h1>
                 <p>Organize files by Texas region and keep local project materials, maps, and records in one place.</p>
                 <ul class="hero-list">
                     <li>Five regional workspaces across Texas</li>

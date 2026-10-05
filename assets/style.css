@@ -61,12 +61,31 @@ header.topbar {
     width: 42px;
     height: 42px;
     border-radius: 14px;
-    background: linear-gradient(135deg, var(--primary), #3e79d6);
+    background: linear-gradient(135deg, #e5484d 0%, #f76b15 28%, #ffc53d 50%, #30a46c 68%, #3e63dd 86%, #8e4ec6 100%);
     color: white;
     display: grid;
     place-items: center;
     font-size: 1.2rem;
     box-shadow: var(--shadow);
+}
+
+.brand-mark svg {
+    width: 30px;
+    height: 30px;
+    fill: #ffffff;
+    display: block;
+}
+
+.hero-brand-mark {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+}
+
+.hero-brand-mark svg {
+    width: 38px;
+    height: 38px;
 }
 
 .user-chip {
