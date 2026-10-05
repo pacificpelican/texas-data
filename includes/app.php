@@ -534,6 +534,144 @@ function delete_assistant_history_for_user($user)
     return write_json_file(assistant_history_file_path(), $remaining);
 }
 
+function shakespeare_source_text()
+{
+    static $text = null;
+    if ($text === null) {
+        $path = app_path('assets/Hamlet.md');
+        $raw = file_exists($path) ? (string) file_get_contents($path) : '';
+
+        // Strip Project Gutenberg boilerplate so excerpts start in the play itself.
+        $startPos = strpos($raw, '*** START OF THE PROJECT GUTENBERG');
+        $endPos = strpos($raw, '*** END OF THE PROJECT GUTENBERG');
+        $startPos = $startPos === false ? 0 : (strpos($raw, "\n", $startPos) + 1);
+        if ($endPos === false || $endPos <= $startPos) {
+            $endPos = strlen($raw);
+        }
+
+        $text = trim(substr($raw, $startPos, $endPos - $startPos));
+    }
+
+    return $text;
+}
+
+function shakespeare_source_word_count()
+{
+    $text = shakespeare_source_text();
+    return $text === '' ? 0 : count(preg_split('/\s+/u', $text) ?: []);
+}
+
+function shakespeare_excerpt($startWord, $limit = 1000, $minWords = 600)
+{
+    $text = shakespeare_source_text();
+    if ($text === '') {
+        return ['excerpt' => '', 'start' => 0, 'end' => 0, 'word_count' => 0, 'total' => 0, 'cut_at_boundary' => false];
+    }
+
+    $words = preg_split('/\s+/u', $text) ?: [];
+    $total = count($words);
+    $start = max(0, min((int) $startWord, max(0, $total - 1)));
+    $hardEnd = min($total, $start + max(1, (int) $limit));
+
+    // Word indexes where a new ACT or SCENE begins (e.g. "ACT I", "SCENE II.").
+    $boundaries = [];
+    $cumulative = 0;
+    foreach (preg_split('/\r\n|\r|\n/', $text) as $line) {
+        $line = trim($line);
+        if (preg_match('/^(ACT|SCENE)\s+[IVXLC]+\b/', $line)) {
+            $boundaries[] = $cumulative;
+        }
+        if ($line !== '') {
+            $cumulative += count(preg_split('/\s+/u', $line) ?: []);
+        }
+        if ($cumulative > $hardEnd) {
+            break;
+        }
+    }
+
+    // Prefer cutting at the last scene break within the allowed window.
+    $cut = $hardEnd;
+    $cutAtBoundary = false;
+    foreach ($boundaries as $boundary) {
+        if ($boundary >= $start + $minWords && $boundary < $hardEnd) {
+            $cut = $boundary;
+            $cutAtBoundary = true;
+        }
+    }
+
+    $slice = array_slice($words, $start, $cut - $start);
+    return [
+        'excerpt' => implode(' ', $slice),
+        'start' => $start,
+        'end' => $cut,
+        'word_count' => count($slice),
+        'total' => $total,
+        'cut_at_boundary' => $cutAtBoundary,
+    ];
+}
+
+function shakespeare_history_file_path()
+{
+    return app_path('data/shakespeare-history.json');
+}
+
+function create_shakespeare_history($user, $excerpt, $prompt, $response, $model = null)
+{
+    $model = $model ?? (string) (get_llm_config()['model'] ?? 'Unknown model');
+    $entry = [
+        'id' => 'shx-' . uniqid('', true),
+        'user_id' => (string) ($user['id'] ?? ''),
+        'user_name' => (string) ($user['name'] ?? 'Unknown'),
+        'user_email' => strtolower((string) ($user['email'] ?? '')),
+        'model' => (string) $model,
+        'excerpt' => (string) $excerpt,
+        'prompt' => (string) $prompt,
+        'response' => (string) $response,
+        'created_at' => gmdate('c'),
+    ];
+
+    $history = read_json_file(shakespeare_history_file_path(), []);
+    $history[] = $entry;
+    return write_json_file(shakespeare_history_file_path(), $history) ? $entry : null;
+}
+
+function shakespeare_history_for_user($user)
+{
+    $userId = (string) ($user['id'] ?? '');
+    if ($userId === '') {
+        return [];
+    }
+
+    $history = read_json_file(shakespeare_history_file_path(), []);
+    $history = array_values(array_filter($history, static fn($entry) => (string) ($entry['user_id'] ?? '') === $userId));
+    usort($history, static fn($a, $b) => strtotime((string) ($b['created_at'] ?? '')) <=> strtotime((string) ($a['created_at'] ?? '')));
+    return $history;
+}
+
+function shakespeare_history_entry_for_user($id, $user)
+{
+    $id = trim((string) $id);
+    foreach (shakespeare_history_for_user($user) as $entry) {
+        if (hash_equals((string) ($entry['id'] ?? ''), $id)) {
+            return $entry;
+        }
+    }
+
+    return null;
+}
+
+function delete_shakespeare_history_for_user($user)
+{
+    $userId = (string) ($user['id'] ?? '');
+    if ($userId === '') {
+        return true;
+    }
+
+    $history = read_json_file(shakespeare_history_file_path(), []);
+    $remaining = array_values(array_filter($history, static fn($entry) => (string) ($entry['user_id'] ?? '') !== $userId));
+    return write_json_file(shakespeare_history_file_path(), $remaining);
+}
+
 function llm_history_file_path()
 {
     return app_path('data/llm-history.json');
@@ -663,21 +801,142 @@ function shorten_text($value, $limit = 96)
     return rtrim(substr($value, 0, max(0, $limit - 3))) . '...';
 }
 
+function user_settings_file_path()
+{
+    return app_path('data/user-settings.json');
+}
+
+function default_region_settings()
+{
+    // The shipped region names are example labels only — rename them on the Settings page.
+    return [
+        'panhandle' => [
+            'label' => 'Panhandle',
+            'default_query' => 'Summarize the most important themes across the Panhandle documents.',
+        ],
+        'north' => [
+            'label' => 'East',
+            'default_query' => 'Summarize the most important themes across the East documents.',
+        ],
+        'central' => [
+            'label' => 'Central Texas',
+            'default_query' => 'Summarize the most important themes across the Central Texas documents.',
+        ],
+        'gulf' => [
+            'label' => 'Gulf Coast',
+            'default_query' => 'Summarize the most important themes across the Gulf Coast documents.',
+        ],
+        'south' => [
+            'label' => 'West',
+            'default_query' => 'Summarize the most important themes across the West documents.',
+        ],
+    ];
+}
+
+function get_user_settings($user = null)
+{
+    $user = $user ?? current_user();
+    $regions = default_region_settings();
+    $theme = 'light';
+
+    $userId = is_array($user) ? (string) ($user['id'] ?? '') : '';
+    if ($userId !== '') {
+        $all = read_json_file(user_settings_file_path(), []);
+        $stored = (is_array($all) && isset($all[$userId]) && is_array($all[$userId])) ? $all[$userId] : [];
+
+        $storedRegions = isset($stored['regions']) && is_array($stored['regions']) ? $stored['regions'] : [];
+        foreach ($regions as $key => $default) {
+            $entry = isset($storedRegions[$key]) && is_array($storedRegions[$key]) ? $storedRegions[$key] : [];
+            $label = trim((string) ($entry['label'] ?? ''));
+            $defaultQuery = trim((string) ($entry['default_query'] ?? ''));
+            $regions[$key] = [
+                'label' => $label !== '' ? $label : $default['label'],
+                'default_query' => $defaultQuery !== '' ? $defaultQuery : $default['default_query'],
+            ];
+        }
+
+        $storedTheme = (string) ($stored['display']['theme'] ?? 'light');
+        $theme = in_array($storedTheme, ['light', 'dark'], true) ? $storedTheme : 'light';
+    }
+
+    return [
+        'regions' => $regions,
+        'display' => ['theme' => $theme],
+    ];
+}
+
+function save_user_settings($input, $user = null)
+{
+    $user = $user ?? current_user();
+    $userId = is_array($user) ? (string) ($user['id'] ?? '') : '';
+    if ($userId === '') {
+        return false;
+    }
+
+    $regionsInput = isset($input['regions']) && is_array($input['regions']) ? $input['regions'] : [];
+    $regions = [];
+    foreach (default_region_settings() as $key => $default) {
+        $entry = isset($regionsInput[$key]) && is_array($regionsInput[$key]) ? $regionsInput[$key] : [];
+        $label = trim((string) ($entry['label'] ?? ''));
+        $regions[$key] = [
+            'label' => $label !== '' ? $label : $default['label'],
+            'default_query' => trim((string) ($entry['default_query'] ?? '')),
+        ];
+    }
+
+    $theme = (string) ($input['display']['theme'] ?? 'light');
+    if (!in_array($theme, ['light', 'dark'], true)) {
+        $theme = 'light';
+    }
+
+    $all = read_json_file(user_settings_file_path(), []);
+    if (!is_array($all)) {
+        $all = [];
+    }
+
+    $all[$userId] = [
+        'regions' => $regions,
+        'display' => ['theme' => $theme],
+    ];
+
+    return write_json_file(user_settings_file_path(), $all);
+}
+
+function get_region_settings($user = null)
+{
+    return get_user_settings($user)['regions'];
+}
+
+function get_user_theme($user = null)
+{
+    return (string) (get_user_settings($user)['display']['theme'] ?? 'light');
+}
+
+function theme_attribute($user = null)
+{
+    return get_user_theme($user) === 'dark' ? ' data-theme="dark"' : '';
+}
+
 function region_options()
 {
-    return [
-        'panhandle' => 'Panhandle',
-        'north' => 'East',
-        'central' => 'Central Texas',
-        'gulf' => 'Gulf Coast',
-        'south' => 'West',
-    ];
+    $options = [];
+    foreach (get_region_settings() as $key => $setting) {
+        $options[$key] = $setting['label'];
+    }
+
+    return $options;
 }
 
 function region_label($key)
 {
     $regions = region_options();
     return $regions[$key] ?? ucfirst(str_replace('-', ' ', $key));
+}
+
+function region_default_query($key)
+{
+    $settings = get_region_settings();
+    return (string) ($settings[$key]['default_query'] ?? '');
 }
 
 function default_user_list()

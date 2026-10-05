@@ -19,7 +19,7 @@ $storageStatus = get_storage_mode_status();
 $uploadsStatus = get_uploads_dir_status();
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute() ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -40,9 +40,11 @@ $uploadsStatus = get_uploads_dir_status();
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <a href="profile.php">Profile</a>
+                    <a href="settings.php">Settings</a>
                     <a href="dashboard.php?region=<?= rawurlencode($currentRegion) ?>">Back to map</a>
                     <a href="assistant.php?region=<?= rawurlencode($currentRegion) ?>">AI Assistant</a>
                     <a href="llm.php">LLM Chat</a>
+                    <a href="shakespeare.php">Shake-speare</a>
                     <a href="logout.php">Log out</a>
                 </div>
 

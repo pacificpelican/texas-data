@@ -340,6 +340,12 @@ button.google {
     color: #7f2b2b;
 }
 
+.alert.success {
+    border-color: rgba(46, 125, 50, 0.25);
+    background: rgba(46, 125, 50, 0.08);
+    color: #256429;
+}
+
 .dashboard-layout {
     display: grid;
     grid-template-columns: 1.15fr 0.85fr;
@@ -769,6 +775,24 @@ button.google {
         box-shadow: none !important;
         background: #fff !important;
     }
+
+    .print-credit {
+        display: block !important;
+        margin-top: 28px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.85rem;
+    }
+}
+
+.print-credit {
+    display: none;
+}
+
+.print-credit a {
+    color: inherit;
 }
 
 .profile-grid {
@@ -895,4 +919,137 @@ button.google {
         flex-direction: column;
         align-items: flex-start;
     }
+}
+
+.map-svg text {
+    fill: var(--ink);
+}
+
+html[data-theme="dark"] {
+    --bg: #0d1520;
+    --card: #182434;
+    --ink: #e2eaf3;
+    --muted: #93a7bb;
+    --line: #2b3d53;
+    --primary: #6ea3f0;
+    --primary-soft: #1c2f4a;
+    --accent: #3ac896;
+    --danger: #d96a6a;
+    --shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+html[data-theme="dark"] body {
+    background: linear-gradient(180deg, #101c2c 0%, #0c141f 100%);
+}
+
+html[data-theme="dark"] .user-chip {
+    background: rgba(24, 36, 52, 0.85);
+}
+
+html[data-theme="dark"] .debug-toggle {
+    background: linear-gradient(135deg, #182434, #1c2f4a);
+    border-color: rgba(110, 163, 240, 0.35);
+}
+
+html[data-theme="dark"] .debug-toggle.is-open {
+    background: linear-gradient(135deg, #1c2f4a, #22395a);
+}
+
+html[data-theme="dark"] .auth-grid,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .panel,
+html[data-theme="dark"] .vault-panel,
+html[data-theme="dark"] .assistant-form,
+html[data-theme="dark"] .assistant-output,
+html[data-theme="dark"] .profile-panel {
+    background: var(--card);
+}
+
+html[data-theme="dark"] input[type="email"],
+html[data-theme="dark"] input[type="password"],
+html[data-theme="dark"] input[type="text"],
+html[data-theme="dark"] input[type="file"],
+html[data-theme="dark"] select,
+html[data-theme="dark"] textarea {
+    background: #101b29;
+    color: var(--ink);
+    border-color: var(--line);
+}
+
+html[data-theme="dark"] button.secondary {
+    background: var(--primary-soft);
+    color: var(--primary);
+}
+
+html[data-theme="dark"] button.google {
+    background: #101b29;
+}
+
+html[data-theme="dark"] .map-svg {
+    background: linear-gradient(180deg, #13202f 0%, #0f1926 100%);
+}
+
+html[data-theme="dark"] .map-region polygon {
+    stroke: rgba(226, 234, 243, 0.55);
+}
+
+html[data-theme="dark"] .region-1 polygon { fill: #26405f; }
+html[data-theme="dark"] .region-2 polygon { fill: #1f4a3c; }
+html[data-theme="dark"] .region-3 polygon { fill: #54401f; }
+html[data-theme="dark"] .region-4 polygon { fill: #3c2f5e; }
+html[data-theme="dark"] .region-5 polygon { fill: #542836; }
+
+html[data-theme="dark"] .map-region.active.region-1 polygon { fill: #33547e; }
+html[data-theme="dark"] .map-region.active.region-2 polygon { fill: #2a6350; }
+html[data-theme="dark"] .map-region.active.region-3 polygon { fill: #6f5529; }
+html[data-theme="dark"] .map-region.active.region-4 polygon { fill: #4f3f7d; }
+html[data-theme="dark"] .map-region.active.region-5 polygon { fill: #6f3648; }
+
+html[data-theme="dark"] .file-item,
+html[data-theme="dark"] .upload-card,
+html[data-theme="dark"] .ai-response,
+html[data-theme="dark"] .profile-card,
+html[data-theme="dark"] .profile-files,
+html[data-theme="dark"] .profile-history {
+    background: #121e2d;
+}
+
+html[data-theme="dark"] .profile-history li,
+html[data-theme="dark"] .profile-files li {
+    background: #101b29;
+}
+
+html[data-theme="dark"] .vault-table th {
+    background: #16243a;
+}
+
+html[data-theme="dark"] .vault-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+html[data-theme="dark"] .pagination-actions a,
+html[data-theme="dark"] .pagination-actions span {
+    background: #101b29;
+}
+
+html[data-theme="dark"] .print-button {
+    background: #101b29;
+    color: var(--ink);
+}
+
+html[data-theme="dark"] .alert {
+    color: #f0a8a8;
+}
+
+html[data-theme="dark"] .alert.success {
+    color: #9ad6a2;
+}
+
+html[data-theme="dark"] .delete-account h3 {
+    color: #f0a8a8;
+}
+
+html[data-theme="dark"] .empty-state,
+html[data-theme="dark"] .ai-empty {
+    background: rgba(110, 163, 240, 0.05);
 }

@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute($user) ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,9 +48,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <a href="profile.php">Profile</a>
+                    <a href="settings.php">Settings</a>
                     <a href="dashboard.php">Back to map</a>
                     <a href="vault.php">Vault</a>
                     <a href="assistant.php">AI Assistant</a>
+                    <a href="shakespeare.php">Shake-speare</a>
                     <a href="logout.php">Log out</a>
                 </div>
 

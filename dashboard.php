@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['upload_file'])) {
 $currentFiles = $filesByRegion[$selectedRegion] ?? [];
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute($user) ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -72,8 +72,10 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <a href="profile.php">Profile</a>
+                    <a href="settings.php">Settings</a>
                     <a href="assistant.php">AI Assistant</a>
                     <a href="llm.php">LLM Chat</a>
+                    <a href="shakespeare.php">Shake-speare</a>
                     <a href="logout.php">Log out</a>
                 </div>
 
@@ -118,12 +120,10 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
                         <polygon points="20,250 100,250 100,330" />
                     </a>
 
-                    <g font-size="16" font-weight="700" fill="#163d68">
-                        <text x="170" y="120">Panhandle</text>
-                        <text x="400" y="145">East</text>
-                        <text x="136" y="305">Central</text>
-                        <text x="390" y="350">Gulf</text>
-                        <text x="38" y="278">West</text>
+                    <g font-size="16" font-weight="700" class="map-labels">
+                        <?php foreach (['panhandle' => [170, 120], 'north' => [400, 145], 'central' => [136, 305], 'gulf' => [390, 350], 'south' => [38, 278]] as $labelKey => [$labelX, $labelY]): ?>
+                            <text x="<?= $labelX ?>" y="<?= $labelY ?>"><?= htmlspecialchars(region_label($labelKey), ENT_QUOTES, 'UTF-8') ?></text>
+                        <?php endforeach; ?>
                     </g>
                 </svg>
             </div>

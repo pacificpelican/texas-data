@@ -16,6 +16,14 @@ if (isset($_POST['task']) && in_array((string) $_POST['task'], ['summary', 'stor
     $task = (string) $_POST['task'];
 }
 $question = trim((string) ($_POST['question'] ?? ''));
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $question === '' && $selectedRegion !== '') {
+    $question = region_default_query($selectedRegion);
+}
+
+$defaultQueriesByRegion = [];
+foreach (array_keys(region_options()) as $regionKey) {
+    $defaultQueriesByRegion[$regionKey] = region_default_query($regionKey);
+}
 
 $allSourceDocuments = collect_vault_documents();
 $sourceDocuments = collect_vault_documents($selectedRegion === '' ? null : $selectedRegion);
@@ -54,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute($user) ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -75,9 +83,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="user-chip">
                     <span>Signed in as <?= htmlspecialchars($user['name'], ENT_QUOTES, 'UTF-8') ?></span>
                     <a href="profile.php">Profile</a>
+                    <a href="settings.php">Settings</a>
                     <a href="dashboard.php?region=<?= rawurlencode($selectedRegion) ?>">Back to map</a>
                     <a href="vault.php?region=<?= rawurlencode($selectedRegion) ?>">Vault</a>
                     <a href="llm.php">LLM Chat</a>
+                    <a href="shakespeare.php">Shake-speare</a>
                     <a href="logout.php">Log out</a>
                 </div>
 
@@ -164,9 +174,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var regionSelect = document.querySelector('select[name="region"]');
+            var questionField = document.querySelector('textarea[name="question"]');
             var sourceContainer = document.getElementById('source-files-container');
             var sourceFilesByRegion = <?php echo json_encode($sourceFilesByRegion, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
             var allSourceFiles = <?php echo json_encode($allSourceFiles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
+            var defaultQueriesByRegion = <?php echo json_encode($defaultQueriesByRegion, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
 
             function renderSourceFiles(regionKey) {
                 var files = regionKey ? (sourceFilesByRegion[regionKey] || []) : allSourceFiles;
@@ -186,6 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 renderSourceFiles(regionSelect.value);
                 regionSelect.addEventListener('change', function () {
                     renderSourceFiles(this.value);
+                    if (questionField && defaultQueriesByRegion[this.value]) {
+                        questionField.value = defaultQueriesByRegion[this.value];
+                    }
                 });
             }
 

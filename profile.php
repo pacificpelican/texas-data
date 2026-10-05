@@ -8,6 +8,7 @@ $uploadsStatus = get_uploads_dir_status();
 $uploadedFiles = user_uploaded_files($user);
 $assistantHistory = assistant_history_for_user($user);
 $llmHistory = llm_history_for_user($user);
+$shakespeareHistory = shakespeare_history_for_user($user);
 $signupTimestamp = (string) ($user['created_at'] ?? '');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_account'])) {
@@ -23,11 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_uploaded_data']
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content'])) {
     delete_assistant_history_for_user($user);
     delete_llm_history_for_user($user);
+    delete_shakespeare_history_for_user($user);
     redirect('profile.php');
 }
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute() ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -51,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
                     <a href="vault.php">Vault</a>
                     <a href="assistant.php">AI Assistant</a>
                     <a href="llm.php">LLM Chat</a>
+                    <a href="shakespeare.php">Shake-speare</a>
+                    <a href="settings.php">Settings</a>
                     <a href="logout.php">Log out</a>
                 </div>
 
@@ -166,6 +170,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
                             <li>
                                 <div class="profile-file-main">
                                     <strong><a href="llm-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text((string) ($entry['prompt'] ?? ''), 72), ENT_QUOTES, 'UTF-8') ?></a></strong>
+                                    <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
+                                </div>
+                                <span class="file-tag"><?= htmlspecialchars((string) (($entry['model'] ?? '') !== '' ? $entry['model'] : 'LLM'), ENT_QUOTES, 'UTF-8') ?></span>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
+
+            <section class="profile-history">
+                <h2>Shake-speare predictions</h2>
+                <?php if ($shakespeareHistory === []): ?>
+                    <div class="empty-state">No predictions yet. Visit the Shake-speare Prediction Machine to continue the text of Hamlet.</div>
+                <?php else: ?>
+                    <ul>
+                        <?php foreach ($shakespeareHistory as $entry): ?>
+                            <li>
+                                <div class="profile-file-main">
+                                    <strong><a href="shakespeare-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text((string) ($entry['excerpt'] ?? ''), 72), ENT_QUOTES, 'UTF-8') ?></a></strong>
                                     <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
                                 </div>
                                 <span class="file-tag"><?= htmlspecialchars((string) (($entry['model'] ?? '') !== '' ? $entry['model'] : 'LLM'), ENT_QUOTES, 'UTF-8') ?></span>

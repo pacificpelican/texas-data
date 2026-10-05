@@ -13,7 +13,7 @@ $createdTimestamp = strtotime((string) ($entry['created_at'] ?? 'now'));
 $documentTitle = 'LLM_Chat_History_' . gmdate('Ymd_His', $createdTimestamp === false ? time() : $createdTimestamp);
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en"<?= theme_attribute() ?>>
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,6 +31,8 @@ $documentTitle = 'LLM_Chat_History_' . gmdate('Ymd_His', $createdTimestamp === f
                 <a href="profile.php">Profile</a>
                 <a href="llm.php">LLM Chat</a>
                 <a href="assistant.php">AI Assistant</a>
+                <a href="shakespeare.php">Shake-speare</a>
+                <a href="settings.php">Settings</a>
                 <a href="logout.php">Log out</a>
             </div>
         </header>
@@ -56,6 +58,8 @@ $documentTitle = 'LLM_Chat_History_' . gmdate('Ymd_His', $createdTimestamp === f
                 <h2>Response</h2>
                 <div class="ai-response"><?= htmlspecialchars((string) ($entry['response'] ?? ''), ENT_QUOTES, 'UTF-8') ?></div>
             </div>
+
+            <footer class="print-credit">Generated using Texas Data by Daniel McKeown <a href="https://altaredwood.work">https://altaredwood.work</a></footer>
         </section>
     </main>
 </body>
