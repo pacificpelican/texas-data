@@ -16,7 +16,8 @@ if (isset($_POST['task']) && in_array((string) $_POST['task'], ['summary', 'stor
     $task = (string) $_POST['task'];
 }
 $question = trim((string) ($_POST['question'] ?? ''));
-if ($_SERVER['REQUEST_METHOD'] !== 'POST' && $question === '' && $selectedRegion !== '') {
+$questionTouched = isset($_POST['question_touched']) && (string) $_POST['question_touched'] === '1';
+if ($selectedRegion !== '' && ($question === '' || !$questionTouched)) {
     $question = region_default_query($selectedRegion);
 }
 
@@ -137,6 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         Ask a follow-up
                         <textarea name="question" placeholder="Example: What are the biggest risks or themes across these documents?"><?= htmlspecialchars($question, ENT_QUOTES, 'UTF-8') ?></textarea>
                     </label>
+                    <input type="hidden" name="question_touched" id="question-touched" value="" />
 
                     <button type="submit" class="primary">Ask the vault</button>
                 </form>
@@ -205,6 +207,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             var regionSelect = document.querySelector('select[name="region"]');
             var questionField = document.querySelector('textarea[name="question"]');
+            var questionTouchedField = document.getElementById('question-touched');
             var sourceContainer = document.getElementById('source-files-container');
             var sourceFilesByRegion = <?php echo json_encode($sourceFilesByRegion, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
             var allSourceFiles = <?php echo json_encode($allSourceFiles, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP); ?>;
@@ -230,7 +233,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     renderSourceFiles(this.value);
                     if (questionField && defaultQueriesByRegion[this.value]) {
                         questionField.value = defaultQueriesByRegion[this.value];
+                        if (questionTouchedField) {
+                            questionTouchedField.value = '';
+                        }
                     }
+                });
+            }
+
+            if (questionField && questionTouchedField) {
+                questionField.addEventListener('input', function () {
+                    questionTouchedField.value = '1';
                 });
             }
 

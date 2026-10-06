@@ -1705,7 +1705,7 @@ function build_vault_assistant_prompt($task, $question, $documents)
     $customQuestion = trim((string) $question);
     $questionText = $customQuestion !== '' ? "\n\nUser request: " . $customQuestion : "";
 
-    return "You are a careful analyst and writer helping review regional documents for a Texas file vault. " .
+    return "You are a careful analyst and writer helping review documents from a file vault. " .
         "Use only the provided documents as the basis for your answer. " .
         "Do not invent facts. If the documents do not provide enough evidence, say so clearly.\n\n" .
         $taskLabel . "\n\nDocuments:\n" . $docText . $questionText;

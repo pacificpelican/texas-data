@@ -8,6 +8,8 @@ if ($entry === null) {
     http_response_code(404);
     exit('Assistant history entry not found.');
 }
+$createdTimestamp = strtotime((string) ($entry['created_at'] ?? 'now'));
+$documentTitle = 'Assistant_Request_' . gmdate('Ymd_His', $createdTimestamp === false ? time() : $createdTimestamp);
 ?>
 <!DOCTYPE html>
 <html lang="en"<?= theme_attribute() ?>>
