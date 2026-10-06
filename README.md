@@ -47,11 +47,11 @@ The app prefers a JSON file store unless a valid MySQL connection is configured 
 
 ## AI features
 
-All AI features (AI Assistant, LLM Chat, Shake-speare Prediction Machine) send prompts to a local Ollama server at localhost:11434 when enabled in the `llm` section of config.php. Change the model there (default llama3.1:8b), and tune the default temperature — each prompt page also offers an optional per-request temperature override, which is recorded alongside each history entry.
+All AI features (AI Assistant, LLM Chat, Shake-speare Prediction Machine) send prompts to a local [Ollama](https://ollama.com/) server at localhost:11434 when enabled in the `llm` section of config.php. Change the model there (default llama3.1:8b), and tune the default temperature — each prompt page also offers an optional per-request temperature override, which is recorded alongside each history entry.
 
 ## Shake-speare Prediction Machine
 
-The source text is the Project Gutenberg edition of Hamlet (assets/Hamlet.md). Excerpts are capped at 1000 words; the start-word slider fetches a passage from any position in the play, preferring to end at a scene break when one falls within the 600–1000 word window. The continuation length can be set to roughly 1×, 1.5×, or 2× the excerpt.
+The source text is the [Project Gutenberg edition of *Hamlet*](https://www.gutenberg.org/ebooks/1524?msg=welcome_stranger) (assets/Hamlet.md). Excerpts are capped at 1000 words; the start-word slider fetches a passage from any position in the play, preferring to end at a scene break when one falls within the 600–1000 word window. The continuation length can be set to roughly 1×, 1.5×, or 2× the excerpt.
 
 ## Notes
 
