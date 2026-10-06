@@ -4,8 +4,8 @@ require_login();
 
 $requestedPath = normalize_storage_relative_path(trim((string) ($_GET['path'] ?? '')));
 if ($requestedPath === '') {
-    http_response_code(404);
-    exit('Missing file path.');
+    require __DIR__ . '/404.php';
+    exit;
 }
 
 $projectRoot = realpath(APP_ROOT);
@@ -13,8 +13,8 @@ $storageRoot = realpath(app_path('storage'));
 $fullPath = realpath(app_path($requestedPath));
 
 if ($projectRoot === false || $storageRoot === false || $fullPath === false || !is_file($fullPath) || strpos($fullPath, $storageRoot) !== 0) {
-    http_response_code(404);
-    exit('File not found.');
+    require __DIR__ . '/404.php';
+    exit;
 }
 
 $mime = 'application/octet-stream';

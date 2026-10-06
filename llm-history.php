@@ -5,8 +5,8 @@ require_login();
 $user = current_user();
 $entry = llm_history_entry_for_user($_GET['id'] ?? '', $user);
 if ($entry === null) {
-    http_response_code(404);
-    exit('LLM history entry not found.');
+    require __DIR__ . '/404.php';
+    exit;
 }
 $modelLabel = (string) (($entry['model'] ?? '') !== '' ? $entry['model'] : (get_llm_config()['model'] ?? 'Unknown model'));
 $createdTimestamp = strtotime((string) ($entry['created_at'] ?? 'now'));

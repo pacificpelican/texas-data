@@ -5,8 +5,8 @@ require_login();
 $user = current_user();
 $entry = assistant_history_entry_for_user($_GET['id'] ?? '', $user);
 if ($entry === null) {
-    http_response_code(404);
-    exit('Assistant history entry not found.');
+    require __DIR__ . '/404.php';
+    exit;
 }
 $createdTimestamp = strtotime((string) ($entry['created_at'] ?? 'now'));
 $documentTitle = 'Assistant_Request_' . gmdate('Ymd_His', $createdTimestamp === false ? time() : $createdTimestamp);
