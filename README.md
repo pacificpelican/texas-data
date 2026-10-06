@@ -51,7 +51,7 @@ All AI features (AI Assistant, LLM Chat, Shake-speare Prediction Machine) send p
 
 ### Setting up Ollama
 
-1. Install Ollama from [ollama.com/download](https://ollama.com/download) (Windows, macOS, and Linux builds available).
+1. Install Ollama from [ollama.com/download](https://ollama.com/download) (Windows, macOS, and Linux builds available).  Ollama may also be available to be installed by package managers like [Chocolatey](https://community.chocolatey.org/packages/Ollama) or [Homebrew](https://formulae.brew.sh/formula/ollama) or [Snap](https://snapcraft.io/install/ollama/ubuntu).
 2. Download the model the app expects:
 
 ```bash
