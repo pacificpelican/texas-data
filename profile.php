@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
     <main class="profile-page">
         <header class="topbar">
             <div class="brand">
-                <a href="vault.php" class="brand-link" aria-label="Open Texas vault overview">
+                <a href="profile.php" class="brand-link" aria-label="Open your profile">
                     <div class="brand-mark"><svg viewBox="0 0 64 48" aria-hidden="true" focusable="false"><path d="M32 12 C25 12 20 10 15 7 C9 4 5 3 3 6 C1 9 5 13 11 15 C16 17 21 18 25 19 L25 23 C25 26 26 29 28 31 L26 44 L38 44 L36 31 C38 29 39 26 39 23 L39 19 C43 18 48 17 53 15 C59 13 63 9 61 6 C59 3 55 4 49 7 C44 10 39 12 32 12 Z"/></svg></div>
                 </a>
                 <span>Texas Data</span>
@@ -135,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
             </div>
 
             <section class="profile-history">
-                <h2>AI assistant history</h2>
+                <h2><a href="assistant.php">AI assistant</a> history</h2>
                 <?php if ($assistantHistory === []): ?>
                     <div class="empty-state">You have not saved any AI assistant requests yet.</div>
                 <?php else: ?>
@@ -161,7 +161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
             </section>
 
             <section class="profile-history">
-                <h2>LLM chat history</h2>
+                <h2><a href="llm.php">LLM chat</a> history</h2>
                 <?php if ($llmHistory === []): ?>
                     <div class="empty-state">You have not saved any LLM chats yet. Visit the LLM Chat page to ask the model anything.</div>
                 <?php else: ?>
@@ -179,8 +179,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
                 <?php endif; ?>
             </section>
 
-            <section class="profile-history">
-                <h2>Shake-speare predictions</h2>
+            <section class="profile-history shx-page">
+                <h2><a href="shakespeare.php">Shake-speare</a> predictions</h2>
                 <?php if ($shakespeareHistory === []): ?>
                     <div class="empty-state">No predictions yet. Visit the Shake-speare Prediction Machine to continue the text of Hamlet.</div>
                 <?php else: ?>

@@ -845,6 +845,125 @@ button.google {
     }
 }
 
+/* Shake-speare Prediction Machine: period flavor */
+.shx-page {
+    font-family: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+}
+
+.shx-page .assistant-form,
+.shx-page .assistant-output,
+.shx-page .ai-response,
+.shx-page .ai-empty,
+.shx-page .user-chip {
+    border-radius: 3px;
+}
+
+.shx-page .assistant-form h2,
+.shx-page .assistant-output h2,
+.shx-page .assistant-file-list h3 {
+    font-variant: small-caps;
+    letter-spacing: 0.04em;
+}
+
+.shx-page .assistant-form,
+.shx-page .assistant-output {
+    background: linear-gradient(180deg, rgba(250, 246, 235, 0.9), rgba(246, 240, 226, 0.9));
+}
+
+.shx-page .ai-response {
+    background: #faf6eb;
+    font-size: 1.02rem;
+    line-height: 1.8;
+}
+
+.shx-page .assistant-form select,
+.shx-page .assistant-form textarea,
+.shx-page .assistant-form input[type="text"] {
+    border-radius: 3px;
+    background: #fdfaf2;
+}
+
+.shx-page button.primary {
+    border-radius: 3px;
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+}
+
+.shx-page .file-tag {
+    border-radius: 3px;
+}
+
+/* The Earl of Oxford's mullet: a star on the word dial thumb (de Vere arms) */
+.shx-page input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 26px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.shx-page input[type="range"]::-webkit-slider-runnable-track {
+    height: 3px;
+    background: var(--line);
+    border-radius: 0;
+}
+
+.shx-page input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    margin-top: -10.5px;
+    background: #b08d2f;
+    border: 1px solid #8a6d22;
+    clip-path: polygon(50% 0%, 62% 36%, 100% 38%, 70% 61%, 81% 100%, 50% 76%, 19% 100%, 30% 61%, 0% 38%, 38% 36%);
+}
+
+.shx-page input[type="range"]::-moz-range-track {
+    height: 3px;
+    background: var(--line);
+    border-radius: 0;
+}
+
+.shx-page input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 0;
+    background: #b08d2f;
+    border: 1px solid #8a6d22;
+    clip-path: polygon(50% 0%, 62% 36%, 100% 38%, 70% 61%, 81% 100%, 50% 76%, 19% 100%, 30% 61%, 0% 38%, 38% 36%);
+}
+
+html[data-theme="dark"] .shx-page .assistant-form,
+html[data-theme="dark"] .shx-page .assistant-output {
+    background: linear-gradient(180deg, #1b1a14, #171712);
+}
+
+html[data-theme="dark"] .shx-page .ai-response {
+    background: #1b1a14;
+}
+
+html[data-theme="dark"] .shx-page .assistant-form select,
+html[data-theme="dark"] .shx-page .assistant-form textarea,
+html[data-theme="dark"] .shx-page .assistant-form input[type="text"] {
+    background: #131209;
+}
+
+/* Period flavor on the profile's Shake-speare history section */
+.profile-history.shx-page li {
+    border-radius: 3px;
+    background: #faf6eb;
+}
+
+.profile-history.shx-page .empty-state {
+    border-radius: 3px;
+}
+
+html[data-theme="dark"] .profile-history.shx-page li {
+    background: #1b1a14;
+}
+
 .profile-grid {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -971,8 +1090,26 @@ button.google {
     }
 }
 
+.profile-history h2 a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.profile-history h2 a:hover {
+    color: var(--primary);
+}
+
 .map-svg text {
     fill: var(--ink);
+}
+
+.map-labels a text {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.map-labels a:hover text {
+    fill: var(--primary);
 }
 
 html[data-theme="dark"] {

@@ -76,10 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
-    <main class="assistant-page">
+    <main class="assistant-page shx-page">
         <header class="topbar">
             <div class="brand">
-                <a href="vault.php" class="brand-link" aria-label="Open Texas vault overview">
+                <a href="profile.php" class="brand-link" aria-label="Open your profile">
                     <div class="brand-mark"><svg viewBox="0 0 64 48" aria-hidden="true" focusable="false"><path d="M32 12 C25 12 20 10 15 7 C9 4 5 3 3 6 C1 9 5 13 11 15 C16 17 21 18 25 19 L25 23 C25 26 26 29 28 31 L26 44 L38 44 L36 31 C38 29 39 26 39 23 L39 19 C43 18 48 17 53 15 C59 13 63 9 61 6 C59 3 55 4 49 7 C44 10 39 12 32 12 Z"/></svg></div>
                 </a>
                 <span>Texas Data</span>
@@ -123,6 +123,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h2>Shake-speare Prediction Machine</h2>
 
                 <p class="muted-note" style="margin-top: 0;">Paste a continuous passage of Shake-speare (up to <?= SHX_EXCERPT_WORD_LIMIT ?> words) and the model will continue the story from there. The full text of <em>Hamlet</em> (<?= number_format($sourceWordCount) ?> words) is available in <code>assets/Hamlet.md</code> if you need source material.</p>
+
+                <p class="muted-note" style="font-style: italic; font-size: 0.85rem;">The dial below bears a mullet &mdash; the star from the de Vere arms &mdash; for those who hold the Earl of Oxford had a hand in these works. <em>Vero nihil verius.</em></p>
 
                 <form method="post">
                     <label>
