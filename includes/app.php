@@ -804,7 +804,13 @@ function shorten_text($value, $limit = 96)
         return $value;
     }
 
-    return rtrim(substr($value, 0, max(0, $limit - 3))) . '...';
+    $cut = substr($value, 0, max(0, $limit - 3));
+    $lastSpace = strrpos($cut, ' ');
+    if ($lastSpace !== false && $lastSpace > ($limit / 2)) {
+        $cut = substr($cut, 0, $lastSpace);
+    }
+
+    return rtrim($cut) . '...';
 }
 
 function user_settings_file_path()

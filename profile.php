@@ -189,7 +189,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['clear_created_content
                             <li>
                                 <div class="profile-file-main">
                                     <strong><a href="shakespeare-history.php?id=<?= rawurlencode((string) $entry['id']) ?>" class="file-link"><?= htmlspecialchars(shorten_text((string) ($entry['excerpt'] ?? ''), 72), ENT_QUOTES, 'UTF-8') ?></a></strong>
-                                    <small><?= htmlspecialchars((string) ($entry['user_name'] ?? 'Unknown'), ENT_QUOTES, 'UTF-8') ?> &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
+                                    <small><?= count(preg_split('/\s+/u', trim((string) ($entry['excerpt'] ?? ''))) ?: []) ?>-word excerpt &middot; <?= htmlspecialchars(date('M j, Y · g:i A', strtotime((string) ($entry['created_at'] ?? 'now'))), ENT_QUOTES, 'UTF-8') ?></small>
                                 </div>
                                 <span class="file-tag"><?= htmlspecialchars((string) (($entry['model'] ?? '') !== '' ? $entry['model'] : 'LLM'), ENT_QUOTES, 'UTF-8') ?></span>
                             </li>
