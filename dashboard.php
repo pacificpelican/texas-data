@@ -57,9 +57,10 @@ $currentFiles = $filesByRegion[$selectedRegion] ?? [];
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Texas Data</title>
     <link rel="stylesheet" href="assets/style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&display=swap" />
 </head>
 <body>
-    <main>
+    <main class="tx-page">
         <header class="topbar">
             <div class="brand">
                 <a href="profile.php" class="brand-link" aria-label="Open your profile">

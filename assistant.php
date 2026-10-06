@@ -69,9 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Texas Data AI Assistant</title>
     <link rel="stylesheet" href="assets/style.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rye&display=swap" />
 </head>
 <body>
-    <main class="assistant-page">
+    <main class="assistant-page tx-page">
         <header class="topbar">
             <div class="brand">
                 <a href="profile.php" class="brand-link" aria-label="Open your profile">

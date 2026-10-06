@@ -1450,3 +1450,42 @@ html[data-theme="dark"] .assistant-loading {
 .notfound-links a:hover {
     text-decoration: underline;
 }
+
+/* Texas country/Western flavor: dashboard, vault, AI assistant */
+.tx-page h1,
+.tx-page h2,
+.tx-page .brand span {
+    font-family: "Rye", "Playfair Display", Georgia, serif;
+    letter-spacing: 0.03em;
+}
+
+.tx-page .panel,
+.tx-page .vault-panel,
+.tx-page .assistant-form,
+.tx-page .assistant-output,
+.tx-page .upload-card,
+.tx-page .file-item,
+.tx-page .ai-response,
+.tx-page .ai-empty,
+.tx-page .user-chip {
+    border-radius: 4px;
+}
+
+.tx-page .panel,
+.tx-page .vault-panel,
+.tx-page .assistant-form,
+.tx-page .assistant-output {
+    border-top: 4px solid transparent;
+    border-image: linear-gradient(90deg, #bf0a30 0%, #bf0a30 50%, #002868 50%, #002868 100%) 1;
+}
+
+.tx-page .map-header h2,
+.tx-page .file-panel h2,
+.tx-page .vault-header h1 {
+    text-transform: uppercase;
+}
+
+.tx-page button.primary {
+    border-radius: 4px;
+    letter-spacing: 0.04em;
+}
