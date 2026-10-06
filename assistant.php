@@ -171,8 +171,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
     </main>
 
+    <div class="assistant-loading" id="assistant-loading" aria-live="polite">
+        <div class="assistant-horn-run" aria-hidden="true">
+            <svg viewBox="0 0 64 64" role="img">
+                <defs>
+                    <linearGradient id="assistant-rainbow" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e5484d"/>
+                        <stop offset="28%" stop-color="#f76b15"/>
+                        <stop offset="50%" stop-color="#ffc53d"/>
+                        <stop offset="68%" stop-color="#30a46c"/>
+                        <stop offset="86%" stop-color="#3e63dd"/>
+                        <stop offset="100%" stop-color="#8e4ec6"/>
+                    </linearGradient>
+                </defs>
+                <rect width="64" height="64" rx="18" fill="url(#assistant-rainbow)"/>
+                <g transform="translate(6, 12) scale(0.8125)">
+                    <path fill="#ffffff" d="M32 12 C25 12 20 10 15 7 C9 4 5 3 3 6 C1 9 5 13 11 15 C16 17 21 18 25 19 L25 23 C25 26 26 29 28 31 L26 44 L38 44 L36 31 C38 29 39 26 39 23 L39 19 C43 18 48 17 53 15 C59 13 63 9 61 6 C59 3 55 4 49 7 C44 10 39 12 32 12 Z"/>
+                </g>
+            </svg>
+        </div>
+        <p>We are currently rounding up your answer y'all!</p>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var assistantForm = document.querySelector('form[method="post"]');
+            var assistantLoading = document.getElementById('assistant-loading');
+            if (assistantForm && assistantLoading) {
+                assistantForm.addEventListener('submit', function () {
+                    assistantLoading.classList.add('is-active');
+                });
+            }
+
             var regionSelect = document.querySelector('select[name="region"]');
             var questionField = document.querySelector('textarea[name="question"]');
             var sourceContainer = document.getElementById('source-files-container');

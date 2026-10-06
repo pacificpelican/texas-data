@@ -1362,3 +1362,50 @@ html[data-theme="dark"] .shx-ox {
 html[data-theme="dark"] .llm-loading {
     background: rgba(13, 21, 32, 0.94);
 }
+
+/* AI Assistant loading: the rainbow longhorn */
+.assistant-loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(243, 245, 247, 0.93);
+    overflow: hidden;
+}
+
+.assistant-loading.is-active {
+    display: flex;
+}
+
+.assistant-loading p {
+    color: var(--ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0;
+    position: relative;
+}
+
+.assistant-horn-run {
+    position: absolute;
+    top: 44%;
+    left: 0;
+    width: 120px;
+    animation: shx-run 2.6s linear infinite;
+}
+
+.assistant-horn-run svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: shx-gallop 0.38s ease-in-out infinite alternate;
+    filter: drop-shadow(0 10px 20px rgba(16, 38, 63, 0.25));
+}
+
+html[data-theme="dark"] .assistant-loading {
+    background: rgba(13, 21, 32, 0.94);
+}

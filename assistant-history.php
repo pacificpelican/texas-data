@@ -37,7 +37,10 @@ if ($entry === null) {
         <section class="profile-panel">
             <div class="profile-header">
                 <h1>Assistant request</h1>
-                <span class="meta-badge"><?= htmlspecialchars(ucfirst((string) ($entry['task'] ?? 'summary')), ENT_QUOTES, 'UTF-8') ?></span>
+                <div class="profile-header-actions">
+                    <button type="button" class="print-button" onclick="window.print();" title="Print or save as PDF" aria-label="Print or save as PDF">🖨️</button>
+                    <span class="meta-badge"><?= htmlspecialchars(ucfirst((string) ($entry['task'] ?? 'summary')), ENT_QUOTES, 'UTF-8') ?></span>
+                </div>
             </div>
             <div class="profile-card">
                 <div class="profile-meta">
@@ -55,6 +58,8 @@ if ($entry === null) {
                 <h2>Request</h2>
                 <div class="ai-response"><?= htmlspecialchars((string) (($entry['question'] ?? '') !== '' ? $entry['question'] : 'No follow-up question was provided.'), ENT_QUOTES, 'UTF-8') ?></div>
             </div>
+
+            <footer class="print-credit">Generated using Texas Data by Daniel McKeown <a href="https://altaredwood.work">https://altaredwood.work</a></footer>
         </section>
     </main>
 </body>
