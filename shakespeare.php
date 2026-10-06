@@ -189,6 +189,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
     </main>
 
+    <div class="shx-loading shx-page" id="shx-loading" aria-live="polite">
+        <div class="shx-ox-run" aria-hidden="true">
+            <svg viewBox="0 0 120 80" role="img">
+                <g class="shx-ox" fill="#6b4a2f">
+                    <ellipse cx="58" cy="36" rx="30" ry="16"/>
+                    <path d="M82 26 C88 22 96 20 102 22 C108 24 110 30 107 35 C104 40 96 41 90 39 L80 44 C78 38 78 31 82 26 Z"/>
+                    <path d="M98 20 C100 12 108 6 116 8 C110 10 106 16 105 22 Z"/>
+                    <circle cx="88" cy="26" r="3"/>
+                    <g stroke="#6b4a2f" stroke-width="6" stroke-linecap="round" fill="none" class="shx-ox-legs">
+                        <path d="M84 48 L102 64"/>
+                        <path d="M76 50 L66 68"/>
+                        <path d="M36 50 L20 62"/>
+                        <path d="M44 50 L54 66"/>
+                    </g>
+                    <path d="M28 30 C18 26 12 18 12 8" stroke="#6b4a2f" stroke-width="4" fill="none" stroke-linecap="round" class="shx-ox-tail"/>
+                    <circle cx="12" cy="8" r="4"/>
+                </g>
+            </svg>
+        </div>
+        <p>The Oxford ox is running your query to the model&hellip;</p>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var shxSlider = document.getElementById('shx-start');
@@ -224,6 +246,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     clearTimeout(shxTimer);
                     var start = this.value;
                     shxTimer = setTimeout(function () { loadShxExcerpt(start); }, 250);
+                });
+            }
+
+            var shxForm = document.querySelector('form[method="post"]');
+            var shxLoading = document.getElementById('shx-loading');
+            if (shxForm && shxLoading) {
+                shxForm.addEventListener('submit', function () {
+                    if (excerptField && excerptField.value.trim() !== '') {
+                        shxLoading.classList.add('is-active');
+                    }
                 });
             }
 

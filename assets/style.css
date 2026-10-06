@@ -1240,3 +1240,64 @@ html[data-theme="dark"] .empty-state,
 html[data-theme="dark"] .ai-empty {
     background: rgba(110, 163, 240, 0.05);
 }
+
+/* Shake-speare loading: the running ox */
+.shx-loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(250, 246, 235, 0.93);
+    overflow: hidden;
+}
+
+.shx-loading.is-active {
+    display: flex;
+}
+
+.shx-loading p {
+    font-variant: small-caps;
+    letter-spacing: 0.08em;
+    color: var(--ink);
+    font-size: 1.05rem;
+    margin: 0;
+    position: relative;
+}
+
+.shx-ox-run {
+    position: absolute;
+    top: 46%;
+    left: 0;
+    width: 140px;
+    animation: shx-run 2.6s linear infinite;
+}
+
+.shx-ox-run svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: shx-gallop 0.38s ease-in-out infinite alternate;
+}
+
+@keyframes shx-run {
+    from { transform: translateX(-160px); }
+    to { transform: translateX(calc(100vw + 40px)); }
+}
+
+@keyframes shx-gallop {
+    from { transform: translateY(0) rotate(-2.5deg); }
+    to { transform: translateY(-9px) rotate(2.5deg); }
+}
+
+html[data-theme="dark"] .shx-loading {
+    background: rgba(14, 13, 9, 0.94);
+}
+
+html[data-theme="dark"] .shx-ox {
+    fill: #cbb98a;
+    stroke: #cbb98a;
+}
