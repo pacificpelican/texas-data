@@ -6,6 +6,7 @@ $user = current_user();
 $userSettings = get_user_settings($user);
 $regionSettings = $userSettings['regions'];
 $theme = $userSettings['display']['theme'];
+$llmConfig = get_llm_config();
 $storageStatus = get_storage_mode_status();
 $uploadsStatus = get_uploads_dir_status();
 $errors = [];
@@ -88,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <section class="profile-panel">
             <div class="profile-header">
-                <h1>Texas settings</h1>
+                <h1>Settings</h1>
             </div>
 
             <p class="muted-note">The Texas region names below are just examples — rename them to anything that fits your project (e.g. neighborhoods, clients, topics). The default query is pre-filled in the AI Assistant whenever that region is selected.</p>
@@ -101,38 +102,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="alert success">Settings saved.</div>
             <?php endif; ?>
 
-            <form method="post" class="form-stack">
-                <h2 style="margin: 0;">Display settings</h2>
-                <div class="profile-card">
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="theme" value="light" <?= $theme === 'light' ? 'checked' : '' ?> />
-                        Light mode (default)
-                    </label>
-                    <label style="display: flex; align-items: center; gap: 10px;">
-                        <input type="radio" name="theme" value="dark" <?= $theme === 'dark' ? 'checked' : '' ?> />
-                        Dark mode
-                    </label>
+            <div class="settings-columns">
+                <div>
+                    <form method="post" class="form-stack" style="margin-top: 0;">
+                        <h2 style="margin: 0;">Display settings</h2>
+                        <div class="profile-card">
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="theme" value="light" <?= $theme === 'light' ? 'checked' : '' ?> />
+                                Light mode (default)
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="radio" name="theme" value="dark" <?= $theme === 'dark' ? 'checked' : '' ?> />
+                                Dark mode
+                            </label>
+                        </div>
+
+                        <h2 style="margin: 10px 0 0;">Texas settings</h2>
+                        <?php foreach ($regionSettings as $key => $setting): ?>
+                            <div class="profile-card">
+                                <h3 style="margin-top: 0;"><?= htmlspecialchars($setting['label'], ENT_QUOTES, 'UTF-8') ?> <span class="file-tag"><?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?></span></h3>
+
+                                <label>
+                                    Region name
+                                    <input type="text" name="regions[<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>][label]" value="<?= htmlspecialchars($setting['label'], ENT_QUOTES, 'UTF-8') ?>" required />
+                                </label>
+
+                                <label>
+                                    Default query
+                                    <textarea name="regions[<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>][default_query]" placeholder="Example: Summarize the most important themes across these documents."><?= htmlspecialchars($setting['default_query'], ENT_QUOTES, 'UTF-8') ?></textarea>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+
+                        <button type="submit" class="primary">Save settings</button>
+                    </form>
                 </div>
 
-                <h2 style="margin: 10px 0 0;">Texas settings</h2>
-                <?php foreach ($regionSettings as $key => $setting): ?>
+                <div>
+                    <h2 style="margin: 0 0 14px;">LLM info</h2>
                     <div class="profile-card">
-                        <h3 style="margin-top: 0;"><?= htmlspecialchars($setting['label'], ENT_QUOTES, 'UTF-8') ?> <span class="file-tag"><?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?></span></h3>
-
-                        <label>
-                            Region name
-                            <input type="text" name="regions[<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>][label]" value="<?= htmlspecialchars($setting['label'], ENT_QUOTES, 'UTF-8') ?>" required />
-                        </label>
-
-                        <label>
-                            Default query
-                            <textarea name="regions[<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>][default_query]" placeholder="Example: Summarize the most important themes across these documents."><?= htmlspecialchars($setting['default_query'], ENT_QUOTES, 'UTF-8') ?></textarea>
-                        </label>
+                        <div class="profile-meta">
+                            <div class="profile-row">
+                                <span>Model</span>
+                                <strong><?= htmlspecialchars((string) $llmConfig['model'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            </div>
+                            <div class="profile-row">
+                                <span>Provider</span>
+                                <strong><?= htmlspecialchars(ucfirst((string) $llmConfig['provider']), ENT_QUOTES, 'UTF-8') ?></strong>
+                            </div>
+                            <div class="profile-row">
+                                <span>Endpoint</span>
+                                <strong><?= htmlspecialchars((string) $llmConfig['api_url'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            </div>
+                            <div class="profile-row">
+                                <span>Default temperature</span>
+                                <strong><?= htmlspecialchars((string) $llmConfig['temperature'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            </div>
+                            <div class="profile-row">
+                                <span>Status</span>
+                                <strong><?= $llmConfig['enabled'] ? 'Enabled' : 'Disabled in config.php' ?></strong>
+                            </div>
+                        </div>
                     </div>
-                <?php endforeach; ?>
 
-                <button type="submit" class="primary">Save settings</button>
-            </form>
+                    <div class="profile-card" style="margin-top: 12px;">
+                        <h3 style="margin-top: 0;">About the Ollama dependency</h3>
+                        <p style="color: var(--muted); line-height: 1.65; margin: 0;">
+                            The AI Assistant, LLM Chat, and Shake-speare Prediction Machine all send prompts to a local
+                            <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> server. The model runs entirely
+                            on your own machine &mdash; no API keys, no cloud calls, and your prompts never leave the box. To change
+                            the model, pull a new one with <code>ollama pull &lt;model&gt;</code> and update the <code>llm</code> section of
+                            <code>config.php</code>.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             <footer class="site-credit">Texas Data by Daniel McKeown <a href="https://altaredwood.work">https://altaredwood.work</a></footer>
         </section>

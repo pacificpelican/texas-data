@@ -832,6 +832,19 @@ button.google {
     text-decoration: underline;
 }
 
+.settings-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .settings-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
 .profile-grid {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;

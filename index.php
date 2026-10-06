@@ -55,17 +55,17 @@ if (isset($_GET['error'])) {
                     <div class="brand-mark hero-brand-mark"><svg viewBox="0 0 64 48" aria-hidden="true" focusable="false"><path d="M32 12 C25 12 20 10 15 7 C9 4 5 3 3 6 C1 9 5 13 11 15 C16 17 21 18 25 19 L25 23 C25 26 26 29 28 31 L26 44 L38 44 L36 31 C38 29 39 26 39 23 L39 19 C43 18 48 17 53 15 C59 13 63 9 61 6 C59 3 55 4 49 7 C44 10 39 12 32 12 Z"/></svg></div>
                 </div>
                 <h1>Texas Data</h1>
-                <p>Organize files by Texas region and keep local project materials, maps, and records in one place.</p>
+                <p>A data transformation platform from <a href="https://altaredwood.work" target="_blank" rel="noopener" style="color: inherit; text-decoration: underline;">Alta Redwood</a></p>
                 <ul class="hero-list">
-                    <li>Five regional workspaces across Texas</li>
-                    <li>Upload, browse, and share files by region</li>
-                    <li>Secure email sign-in with optional Google access</li>
+                    <li>File upload + LLM prompt tool</li>
+                    <li>LLM Query and Response Tracker</li>
+                    <li>Shake-speare LLM auto-continue tool</li>
                 </ul>
             </div>
 
             <div class="auth-card">
                 <h2>Welcome back</h2>
-                <p>Sign in to access your Texas region files.</p>
+                <p>Sign in to view your account</p>
 
                 <?php foreach ($errors as $error): ?>
                     <div class="alert"><?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?></div>
@@ -104,14 +104,11 @@ if (isset($_GET['error'])) {
                     </div>
                 </div>
 
-                <div class="divider">or</div>
-
                 <?php if ($googleOAuthEnabled): ?>
+                    <div class="divider">or</div>
                     <div class="form-stack">
                         <a href="google-login.php" class="google" style="display: inline-block; width: 100%; text-align: center; text-decoration: none;">Continue with Google</a>
                     </div>
-                <?php else: ?>
-                    <div class="muted-note" style="margin-top: 8px; font-size: 0.9rem; color: var(--muted);">Google sign-in is currently unavailable.</div>
                 <?php endif; ?>
 
             </div>
