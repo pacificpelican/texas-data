@@ -43,15 +43,43 @@ A demo account is seeded on first run: `demo@texasdrive.app` / `demo123`.
 
 ## Local-first data behavior
 
-The app prefers a JSON file store unless a valid MySQL connection is configured in config.php. This keeps the project portable and easy to run locally without a database server. Per-user settings live in data/user-settings.json; accounts without saved settings always see the built-in defaults.
+The app prefers a JSON file store unless a valid MySQL connection is configured in [config.php](./config.php). This keeps the project portable and easy to run locally without a database server. Per-user settings live in data/user-settings.json; accounts without saved settings always see the built-in defaults.
 
 ## AI features
 
 All AI features (AI Assistant, LLM Chat, Shake-speare Prediction Machine) send prompts to a local [Ollama](https://ollama.com/) server at localhost:11434 when enabled in the `llm` section of config.php. Change the model there (default llama3.1:8b), and tune the default temperature — each prompt page also offers an optional per-request temperature override, which is recorded alongside each history entry.
 
+### Setting up Ollama
+
+1. Install Ollama from [ollama.com/download](https://ollama.com/download) (Windows, macOS, and Linux builds available).
+2. Download the model the app expects:
+
+```bash
+ollama pull llama3.1:8b
+```
+
+3. Start the server (it usually runs automatically after install, but this works everywhere):
+
+```bash
+ollama serve
+```
+
+The API listens on `http://localhost:11434` by default, which matches `config.php` out of the box.
+
+Useful day-to-day commands:
+
+```bash
+ollama list            # show downloaded models
+ollama run llama3.1:8b # quick chat test in the terminal
+ollama rm llama3.1:8b  # remove a model to free disk space
+ollama ps              # show which models are currently loaded
+```
+
+To try a different model, pull it and update the `model` value in the `llm` section of config.php — no other code changes needed. Larger models (e.g. llama3.1:70b) produce noticeably better results but need far more RAM/VRAM; the 8b default is a good balance for a local machine.
+
 ## Shake-speare Prediction Machine
 
-The source text is the [Project Gutenberg edition of *Hamlet*](https://www.gutenberg.org/ebooks/1524?msg=welcome_stranger) (assets/Hamlet.md). Excerpts are capped at 1000 words; the start-word slider fetches a passage from any position in the play, preferring to end at a scene break when one falls within the 600–1000 word window. The continuation length can be set to roughly 1×, 1.5×, or 2× the excerpt.
+The source text is the [Project Gutenberg edition of *Hamlet*](https://www.gutenberg.org/ebooks/1524?msg=welcome_stranger) ([assets/Hamlet.md](./assets/Hamlet.md)). Excerpts are capped at 1000 words; the start-word slider fetches a passage from any position in the play, preferring to end at a scene break when one falls within the 600–1000 word window. The continuation length can be set to roughly 1×, 1.5×, or 2× the excerpt.
 
 ## Notes
 
