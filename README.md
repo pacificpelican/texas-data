@@ -45,7 +45,7 @@ Texas Data is a data transformation platform from [Alta Redwood](https://altared
 From the project directory:
 
 ```bash
-php -S 127.0.0.1:8000
+php -S 127.0.0.1:8000 router.php
 ```
 
 Then open:
