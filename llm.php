@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </header>
 
-        <section class="assistant-shell">
+        <section class="assistant-shell llm-shell">
             <aside class="assistant-form">
                 <h2>General LLM Chat</h2>
 
@@ -132,8 +132,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </section>
     </main>
 
+    <div class="llm-loading" id="llm-loading" aria-live="polite">
+        <div class="llm-bot-run" aria-hidden="true">
+            <svg viewBox="0 0 90 90" role="img">
+                <g class="llm-bot">
+                    <rect x="20" y="22" width="50" height="38" rx="9" fill="var(--primary)"/>
+                    <circle cx="33" cy="38" r="6" fill="#ffffff"/>
+                    <circle cx="57" cy="38" r="6" fill="#ffffff"/>
+                    <circle class="llm-bot-eye" cx="33" cy="38" r="2.6" fill="var(--primary)"/>
+                    <circle class="llm-bot-eye" cx="57" cy="38" r="2.6" fill="var(--primary)"/>
+                    <rect x="34" y="50" width="22" height="5" rx="2.5" fill="#ffffff" opacity="0.85"/>
+                    <path d="M45 22 L45 10" stroke="var(--primary)" stroke-width="4" stroke-linecap="round"/>
+                    <circle cx="45" cy="8" r="4.5" fill="var(--accent)"/>
+                    <rect x="10" y="30" width="8" height="16" rx="4" fill="var(--primary)" opacity="0.85"/>
+                    <rect x="72" y="30" width="8" height="16" rx="4" fill="var(--primary)" opacity="0.85"/>
+                    <path d="M30 60 L22 78" stroke="var(--primary)" stroke-width="7" stroke-linecap="round"/>
+                    <path d="M60 60 L70 76" stroke="var(--primary)" stroke-width="7" stroke-linecap="round"/>
+                </g>
+            </svg>
+        </div>
+        <p>As Stephen Wolfram explains it: the model just keeps adding the most probable next word, given everything so far. Your robot is off fetching those words now&hellip;</p>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            var llmForm = document.querySelector('form[method="post"]');
+            var llmLoading = document.getElementById('llm-loading');
+            var llmPrompt = document.querySelector('textarea[name="prompt"]');
+            if (llmForm && llmLoading) {
+                llmForm.addEventListener('submit', function () {
+                    if (llmPrompt && llmPrompt.value.trim() !== '') {
+                        llmLoading.classList.add('is-active');
+                    }
+                });
+            }
+
             document.querySelectorAll('.debug-toggle').forEach(function (button) {
                 var panel = document.getElementById(button.getAttribute('aria-controls'));
                 if (!panel) {

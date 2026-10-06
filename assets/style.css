@@ -613,6 +613,10 @@ button.google {
     align-items: start;
 }
 
+.llm-shell {
+    grid-template-columns: 1fr 1fr;
+}
+
 .assistant-form,
 .assistant-output {
     background: rgba(255, 255, 255, 0.82);
@@ -1300,4 +1304,61 @@ html[data-theme="dark"] .shx-loading {
 html[data-theme="dark"] .shx-ox {
     fill: #cbb98a;
     stroke: #cbb98a;
+}
+
+/* LLM chat loading: the running robot */
+.llm-loading {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(243, 245, 247, 0.93);
+    overflow: hidden;
+}
+
+.llm-loading.is-active {
+    display: flex;
+}
+
+.llm-loading p {
+    max-width: 520px;
+    text-align: center;
+    color: var(--ink);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0 20px;
+    position: relative;
+}
+
+.llm-bot-run {
+    position: absolute;
+    top: 46%;
+    left: 0;
+    width: 90px;
+    animation: shx-run 2.6s linear infinite;
+}
+
+.llm-bot-run svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    animation: shx-gallop 0.38s ease-in-out infinite alternate;
+}
+
+.llm-bot-run .llm-bot-eye {
+    animation: llm-blink 1.3s ease-in-out infinite;
+}
+
+@keyframes llm-blink {
+    0%, 88%, 100% { opacity: 1; }
+    92%, 96% { opacity: 0.15; }
+}
+
+html[data-theme="dark"] .llm-loading {
+    background: rgba(13, 21, 32, 0.94);
 }
