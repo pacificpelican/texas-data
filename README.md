@@ -87,4 +87,7 @@ The source text is the [Project Gutenberg edition of *Hamlet*](https://www.guten
 - The debug widget can be toggled from the top-right of the app pages for local troubleshooting.
 - The app is designed to degrade gracefully when optional services are unavailable.
 
+## License
+
+- Texas Data code is copyright 2026 [Daniel J. McKeown](https://danieljmckeown.com) & licensed under the [ISC License](https://opensource.org/license/ISC)
 
